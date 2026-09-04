@@ -1,0 +1,6 @@
+{
+  "name": "SkillBridge AI",
+  "description": "Evidence-driven student skill, career, learning, opportunity, industry, institution and startup ecosystem.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
