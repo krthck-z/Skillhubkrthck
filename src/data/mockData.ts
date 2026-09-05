@@ -9,6 +9,8 @@ import {
   ScholarshipItem,
   InstitutionItem,
   StartupIdea,
+  StartupFundingScheme,
+  CandidateTalentProfile,
   MentorItem,
   SuccessJourneyItem,
   AchievementItem,
@@ -1014,15 +1016,100 @@ export const initialStartupIdeas: StartupIdea[] = [
   {
     id: 'startup-agri-ai',
     founderName: 'Suresh Reddy',
-    founderRole: 'Agronomist & Entrepreneur',
+    founderRole: 'Agronomist & Student Entrepreneur',
+    founderAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    institution: 'Sri Krishnadevaraya University Innovation Cell (DEMO)',
     ideaTitle: 'AI Agriculture Assistant (Kisan Mitra)',
-    problem: 'Smallholder farmers in semi-arid Rayalaseema struggle with unpredictable pest outbreaks and lack localized soil crop advisory.',
+    problem: 'Smallholder farmers in semi-arid Rayalaseema struggle with unpredictable pest outbreaks and lack localized, dialect-aware soil crop advisory.',
     solution: 'Offline-first smartphone application that analyzes smartphone leaf images with lightweight vision models and provides regional Telugu voice guidance.',
     category: 'Agritech',
-    stage: 'Prototype',
+    stage: 'PROTOTYPE',
     location: 'Anantapur / Hyderabad',
+    workMode: 'Hybrid',
     teamCountCurrent: 3,
     teamCountTarget: 5,
+    teamMembers: [
+      {
+        id: 'tm-1',
+        name: 'Suresh Reddy',
+        role: 'Founder & Agronomy Lead',
+        verifiedSkills: ['Domain Knowledge', 'AgTech', 'Field Research'],
+        evidenceLevel: 'REAL_PERFORMANCE',
+        joinedAt: '3 months ago',
+        isFounder: true,
+        status: 'ACTIVE'
+      },
+      {
+        id: 'tm-2',
+        name: 'Divya Varma',
+        role: 'ML & Computer Vision Engineer',
+        verifiedSkills: ['Python', 'PyTorch', 'MobileNet'],
+        evidenceLevel: 'PRACTICAL_VERIFIED',
+        joinedAt: '2 months ago',
+        status: 'ACTIVE'
+      },
+      {
+        id: 'tm-3',
+        name: 'Ravi Teja',
+        role: 'IoT Hardware Prototyper',
+        verifiedSkills: ['Arduino', 'Soil Sensors', 'C++'],
+        evidenceLevel: 'ASSESSMENT_PASSED',
+        joinedAt: '1 month ago',
+        status: 'ACTIVE'
+      }
+    ],
+    openRoles: [
+      {
+        id: 'role-agri-frontend',
+        roleTitle: 'React Frontend Developer',
+        department: 'Engineering',
+        skillsRequired: ['React', 'TypeScript', 'Tailwind', 'Audio APIs'],
+        spotsAvailable: 1,
+        description: 'Build farmer-accessible offline-first PWA with multi-lingual audio cards and instant pest diagnostic dashboards.',
+        matchPercent: 94,
+        applicantsCount: 3
+      },
+      {
+        id: 'role-agri-telugu',
+        roleTitle: 'Telugu Language & Voice AI Specialist',
+        department: 'Localization',
+        skillsRequired: ['Telugu Translation', 'TTS / STT', 'UX Copy'],
+        spotsAvailable: 1,
+        description: 'Conduct village testing, refine dialect voice prompts and create farmer onboarding audio scripts.',
+        matchPercent: 78,
+        applicantsCount: 1
+      }
+    ],
+    applicants: [
+      {
+        id: 'app-101',
+        startupId: 'startup-agri-ai',
+        studentName: 'Harshita Sen',
+        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
+        roleApplied: 'React Frontend Developer',
+        matchScore: 88,
+        verifiedSkills: ['React', 'JavaScript', 'CSS Modules'],
+        evidenceLevel: 'PRACTICAL_VERIFIED',
+        intro: 'Built 2 community web portals and eager to deliver offline PWA tech for Rayalaseema agricultural communities.',
+        status: 'PENDING',
+        appliedDate: '1 day ago',
+        projectsCount: 2
+      },
+      {
+        id: 'app-102',
+        startupId: 'startup-agri-ai',
+        studentName: 'Vikas Rao',
+        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+        roleApplied: 'Telugu Language & Voice AI Specialist',
+        matchScore: 75,
+        verifiedSkills: ['Telugu Voice UX', 'Content Writing'],
+        evidenceLevel: 'ASSESSMENT_PASSED',
+        intro: 'Native Telugu speaker from Kurnool with research paper on rural interface usability.',
+        status: 'PENDING',
+        appliedDate: '3 days ago',
+        projectsCount: 1
+      }
+    ],
     skillsNeeded: ['React', 'Python', 'ML / Vision Models', 'Telugu Localization'],
     fundingNeeded: '₹5,00,000 (Grant Stage)',
     visibility: 'Public',
@@ -1034,20 +1121,87 @@ export const initialStartupIdeas: StartupIdea[] = [
       { requiredSkill: 'React', minEvidence: 'CERTIFICATE_VERIFIED' }
     ],
     userJoinStatus: 'NONE',
-    createdAt: '2 days ago'
+    createdAt: '2 days ago',
+    targetUsers: 'Small & marginal farmers (1-5 acres), village agricultural extension officers, FPOs',
+    businessModel: 'Freemium farmer diagnostic; B2B soil health data dashboard for Agri-Input co-operatives',
+    technologyStack: ['React', 'TypeScript', 'Tailwind', 'TensorFlow Lite', 'FastAPI', 'IndexedDB'],
+    resourcesNeeded: ['GPU compute hours', 'Farmer pilot access in Dharmavaram cluster', 'Soil testing lab validation'],
+    mentorRequirement: 'Technical Mentor in Edge AI + Domain Mentor in Farmer Producer Organizations (FPOs)',
+    industrySupportNeeded: 'Agri-retail partnerships for localized product testing',
+    governmentSupportNeeded: 'RKVY-RAFTAAR / AIC Incubation Seed Grant eligibility verification',
+    expectedImpact: 'Reduce pesticide expenditure by 30% for 1,200 farmers across 8 pilot villages in year one',
+    readinessScore: 76,
+    readinessFactors: [
+      { factor: 'Problem Clarity', status: 'DONE', detail: 'Surveyed 65 farmers across Anantapur and Dharmavaram mandals.' },
+      { factor: 'Solution Architecture', status: 'DONE', detail: 'Edge-AI vision model pipeline validated on 1,400 pest images.' },
+      { factor: 'Team Completeness', status: 'WARNING', detail: 'Core ML & Agronomy ready; React Frontend role currently recruiting.' },
+      { factor: 'Working Prototype', status: 'DONE', detail: 'Alpha APK tested with 12 progressive farmers.' },
+      { factor: 'Validation Evidence', status: 'WARNING', detail: 'Need structured viva defense and lab calibration certificate.' },
+      { factor: 'Funding Strategy', status: 'DONE', detail: 'Applied to State Agri-Incubator Grant program.' }
+    ],
+    verificationStatus: 'INCUBATOR_VERIFIED',
+    milestoneProgress: 68,
+    studentFriendly: true
   },
   {
     id: 'startup-mesh-edu',
     founderName: 'Pooja Sharma',
-    founderRole: 'Student Innovator',
+    founderRole: 'Student Innovator & System Architect',
+    founderAvatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
+    institution: 'Bengaluru Advanced Technology Institute (DEMO)',
     ideaTitle: 'EduReach Offline Peer Mesh',
-    problem: 'Students in rural colleges with frequent internet disruptions miss out on collaborative coding and assignment synchronization.',
-    solution: 'Peer-to-peer Wi-Fi Direct and Bluetooth low-energy packet mesh network that syncs code repositories without active cellular internet.',
+    problem: 'Students in rural and peri-urban colleges with frequent internet disruptions miss out on collaborative coding, digital textbooks, and assignment synchronization.',
+    solution: 'Peer-to-peer Wi-Fi Direct and Bluetooth low-energy packet mesh network that syncs code repositories, git diffs, and lecture notes without active cellular internet.',
     category: 'Edtech',
-    stage: 'Idea',
-    location: 'Bengaluru',
+    stage: 'IDEA',
+    location: 'Bengaluru / Remote',
+    workMode: 'Remote',
     teamCountCurrent: 2,
     teamCountTarget: 4,
+    teamMembers: [
+      {
+        id: 'tm-me-1',
+        name: 'Pooja Sharma',
+        role: 'Founder & Protocols Architect',
+        verifiedSkills: ['Node.js', 'Networking', 'WebSockets'],
+        evidenceLevel: 'PRACTICAL_VERIFIED',
+        joinedAt: '1 month ago',
+        isFounder: true,
+        status: 'ACTIVE'
+      },
+      {
+        id: 'tm-me-2',
+        name: 'Arjun Das',
+        role: 'Security & Encryption Lead',
+        verifiedSkills: ['Cryptography', 'Go', 'Public Key Infrastructure'],
+        evidenceLevel: 'ASSESSMENT_PASSED',
+        joinedAt: '3 weeks ago',
+        status: 'ACTIVE'
+      }
+    ],
+    openRoles: [
+      {
+        id: 'role-mesh-fe',
+        roleTitle: 'Full Stack PWA Engineer',
+        department: 'Frontend',
+        skillsRequired: ['React', 'JavaScript', 'Service Workers', 'IndexedDB'],
+        spotsAvailable: 1,
+        description: 'Design local-first web app UI with real-time peer discovery status indicators.',
+        matchPercent: 91,
+        applicantsCount: 2
+      },
+      {
+        id: 'role-mesh-qa',
+        roleTitle: 'Network Protocol QA Specialist',
+        department: 'Quality Assurance',
+        skillsRequired: ['Python', 'Network Testing', 'Packet Analysis'],
+        spotsAvailable: 1,
+        description: 'Simulate packet drop and latency across multi-device Wi-Fi direct topologies.',
+        matchPercent: 70,
+        applicantsCount: 1
+      }
+    ],
+    applicants: [],
     skillsNeeded: ['Node.js', 'JavaScript', 'Networking / WebSockets', 'PWA'],
     fundingNeeded: '₹2,50,000 (Incubation)',
     visibility: 'Public',
@@ -1058,20 +1212,120 @@ export const initialStartupIdeas: StartupIdea[] = [
       { requiredSkill: 'JavaScript', minEvidence: 'PRACTICAL_VERIFIED' }
     ],
     userJoinStatus: 'NONE',
-    createdAt: '4 days ago'
+    createdAt: '4 days ago',
+    targetUsers: 'College engineering students, hackathon organizers, and rural computer labs',
+    businessModel: 'Open-core open source library; campus enterprise management suite for colleges',
+    technologyStack: ['Node.js', 'React', 'WebRTC', 'IndexedDB', 'Service Workers'],
+    resourcesNeeded: ['5 Android test devices for mesh stress testing', 'Campus testbed permission'],
+    mentorRequirement: 'Distributed Systems Architect or P2P Networking Researcher',
+    industrySupportNeeded: 'Cloud infrastructure credits for fallback sync gateway',
+    governmentSupportNeeded: 'State Innovation Mission student prototype fellowship',
+    expectedImpact: 'Enable zero-data collaborative lab learning for over 5,000 tier-2/3 college students',
+    readinessScore: 58,
+    readinessFactors: [
+      { factor: 'Problem Clarity', status: 'DONE', detail: 'Documented offline barriers across 4 engineering colleges.' },
+      { factor: 'Solution Architecture', status: 'DONE', detail: 'Wi-Fi direct sync protocol design RFC published on GitHub.' },
+      { factor: 'Team Completeness', status: 'WARNING', detail: 'Lacks dedicated frontend PWA developer.' },
+      { factor: 'Working Prototype', status: 'MISSING', detail: 'Core socket sync code written; UI integration pending.' },
+      { factor: 'Validation Evidence', status: 'MISSING', detail: 'Needs multi-device field demonstration.' },
+      { factor: 'Funding Strategy', status: 'WARNING', detail: 'Shortlisted for institutional innovation seed grant.' }
+    ],
+    verificationStatus: 'PENDING_VERIFICATION',
+    milestoneProgress: 35,
+    studentFriendly: true
   },
   {
     id: 'startup-gig-bridge',
     founderName: 'Anil Kumar',
-    founderRole: 'Product Builder',
+    founderRole: 'Product Builder & Student Founder',
+    founderAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+    institution: 'Government Polytechnic & Skill Hub (DEMO)',
     ideaTitle: 'CampusGig Local Work Exchange',
-    problem: 'College students need verified skill-based part-time income to sustain tuition, while local small businesses lack affordable tech assistance.',
-    solution: 'Skill-verified micro-task escrow marketplace connecting local shops with nearby college coders and designers.',
+    problem: 'College students need verified skill-based part-time income to sustain tuition, while local small businesses lack affordable tech and digital assistance.',
+    solution: 'Skill-verified micro-task escrow marketplace connecting local shops, clinics, and accounting firms with nearby college coders, designers, and tally operators.',
     category: 'SaaS',
     stage: 'MVP Built',
-    location: 'Anantapur',
+    location: 'Anantapur / Rayalaseema',
+    workMode: 'On-Site',
     teamCountCurrent: 4,
     teamCountTarget: 6,
+    teamMembers: [
+      {
+        id: 'tm-gb-1',
+        name: 'Anil Kumar',
+        role: 'Founder & Business Ops',
+        verifiedSkills: ['Product Design', 'Merchant Onboarding', 'Operations'],
+        evidenceLevel: 'PRACTICAL_VERIFIED',
+        joinedAt: '4 months ago',
+        isFounder: true,
+        status: 'ACTIVE'
+      },
+      {
+        id: 'tm-gb-2',
+        name: 'Sneha Patel',
+        role: 'Full Stack & Payment Specialist',
+        verifiedSkills: ['Node.js', 'SQL', 'Razorpay Integration'],
+        evidenceLevel: 'INDUSTRY_VERIFIED',
+        joinedAt: '3 months ago',
+        status: 'ACTIVE'
+      },
+      {
+        id: 'tm-gb-3',
+        name: 'Kiran Goud',
+        role: 'Community & Student Growth',
+        verifiedSkills: ['Digital Marketing', 'Campus Ambassador', 'Events'],
+        evidenceLevel: 'SELF_DECLARED',
+        joinedAt: '2 months ago',
+        status: 'ACTIVE'
+      },
+      {
+        id: 'tm-gb-4',
+        name: 'Meera Nair',
+        role: 'UI/UX Designer',
+        verifiedSkills: ['Figma', 'User Research', 'Design Systems'],
+        evidenceLevel: 'PRACTICAL_VERIFIED',
+        joinedAt: '1 month ago',
+        status: 'ACTIVE'
+      }
+    ],
+    openRoles: [
+      {
+        id: 'role-gig-dev',
+        roleTitle: 'React & Mobile Web Specialist',
+        department: 'Frontend',
+        skillsRequired: ['React', 'TypeScript', 'Tailwind', 'PWA'],
+        spotsAvailable: 1,
+        description: 'Implement real-time micro-task escrow chat, order confirmation cards, and automated skill-matching feed.',
+        matchPercent: 96,
+        applicantsCount: 4
+      },
+      {
+        id: 'role-gig-qa',
+        roleTitle: 'Escrow Security & QA Analyst',
+        department: 'Engineering',
+        skillsRequired: ['SQL', 'Security Audits', 'Manual & API Testing'],
+        spotsAvailable: 1,
+        description: 'Verify payment payout safety, dispute handling, and transaction audit trails.',
+        matchPercent: 82,
+        applicantsCount: 2
+      }
+    ],
+    applicants: [
+      {
+        id: 'app-gb-1',
+        startupId: 'startup-gig-bridge',
+        studentName: 'Karthik Peetla',
+        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+        roleApplied: 'React & Mobile Web Specialist',
+        matchScore: 96,
+        verifiedSkills: ['React', 'Python', 'SQL', 'Git'],
+        evidenceLevel: 'PRACTICAL_VERIFIED',
+        intro: 'Full Stack aspirant with certified React credentials and 2 production projects. Ready to build localized shopkeeper UI.',
+        status: 'PENDING',
+        appliedDate: 'Yesterday',
+        projectsCount: 3
+      }
+    ],
     skillsNeeded: ['React', 'SQL', 'Payment Gateway Integration'],
     fundingNeeded: '₹8,00,000 (Angel Seed)',
     visibility: 'Public',
@@ -1081,8 +1335,281 @@ export const initialStartupIdeas: StartupIdea[] = [
     eligibilityCriteria: [
       { requiredSkill: 'SQL', minEvidence: 'OFFLINE_VERIFIED' }
     ],
+    userJoinStatus: 'REQUESTED',
+    createdAt: '1 week ago',
+    targetUsers: '14,000 college students and 2,500 retail merchants, tax consultants, and schools in district centers',
+    businessModel: '8% platform escrow fee on completed merchant micro-contracts',
+    technologyStack: ['React', 'Node.js', 'PostgreSQL', 'Tailwind', 'Razorpay Webhooks'],
+    resourcesNeeded: ['Merchant merchant associations tie-up', 'Legal counsel for escrow terms'],
+    mentorRequirement: 'Fintech / Marketplace Operations Leader',
+    industrySupportNeeded: 'District Chamber of Commerce endorsement',
+    governmentSupportNeeded: 'MSME Youth Entrepreneurship seed subsidy',
+    expectedImpact: 'Disbursed ₹1,40,000 in student stipends during pilot with 48 merchants',
+    readinessScore: 84,
+    readinessFactors: [
+      { factor: 'Problem Clarity', status: 'DONE', detail: 'Completed 120 paid tasks in initial offline pilot.' },
+      { factor: 'Solution Architecture', status: 'DONE', detail: 'Escrow state machine and instant payout webhook verified.' },
+      { factor: 'Team Completeness', status: 'DONE', detail: '4 dedicated co-founders covering business, dev, design & ops.' },
+      { factor: 'Working Prototype', status: 'DONE', detail: 'Live web MVP deployed with test merchant accounts.' },
+      { factor: 'Validation Evidence', status: 'DONE', detail: 'Offline merchant testimonials and passbook statements collected.' },
+      { factor: 'Funding Strategy', status: 'WARNING', detail: 'Seeking ₹8L seed support to scale across 3 neighbouring districts.' }
+    ],
+    verificationStatus: 'GOVERNMENT_VERIFIED',
+    milestoneProgress: 85,
+    studentFriendly: true
+  },
+  {
+    id: 'startup-med-sync',
+    founderName: 'Dr. Keerthi Rao',
+    founderRole: 'Health Informatics Researcher & Founder',
+    founderAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+    institution: 'AP MedTech Zone Innovation Sandbox (DEMO)',
+    ideaTitle: 'MedVani Rural Tele-Triage & EHR',
+    problem: 'Primary Health Centres (PHCs) lack rapid specialist consultation linkages and patient records are lost in physical paper booklets.',
+    solution: 'ABDM-compliant regional speech-to-text clinic workstation that translates patient symptoms and syncs verified health summary records with district hospitals.',
+    category: 'Healthtech',
+    stage: 'VALIDATED',
+    location: 'Visakhapatnam / Remote',
+    workMode: 'Hybrid',
+    teamCountCurrent: 2,
+    teamCountTarget: 5,
+    teamMembers: [
+      {
+        id: 'tm-ms-1',
+        name: 'Dr. Keerthi Rao',
+        role: 'Clinical Lead & Founder',
+        verifiedSkills: ['Public Health', 'ABDM Standards', 'Clinical Research'],
+        evidenceLevel: 'INDUSTRY_VERIFIED',
+        joinedAt: '2 months ago',
+        isFounder: true,
+        status: 'ACTIVE'
+      },
+      {
+        id: 'tm-ms-2',
+        name: 'Gaurav Kulkarni',
+        role: 'Backend & FHIR Architect',
+        verifiedSkills: ['Python', 'FHIR / HL7', 'Docker', 'PostgreSQL'],
+        evidenceLevel: 'PRACTICAL_VERIFIED',
+        joinedAt: '1 month ago',
+        status: 'ACTIVE'
+      }
+    ],
+    openRoles: [
+      {
+        id: 'role-med-ui',
+        roleTitle: 'Accessibility & Clinical UI Designer',
+        department: 'Design',
+        skillsRequired: ['Figma', 'Healthcare UX', 'WCAG AA Accessibility'],
+        spotsAvailable: 1,
+        description: 'Design zero-clutter touchscreens for rural clinic ASHA workers and nurses.',
+        matchPercent: 85,
+        applicantsCount: 1
+      },
+      {
+        id: 'role-med-fullstack',
+        roleTitle: 'Full Stack React & API Engineer',
+        department: 'Engineering',
+        skillsRequired: ['React', 'TypeScript', 'Secure APIs', 'HIPAA/ABDM compliance'],
+        spotsAvailable: 1,
+        description: 'Connect clinic UI with ABDM sandbox gateway and implement patient consent flows.',
+        matchPercent: 93,
+        applicantsCount: 2
+      }
+    ],
+    applicants: [],
+    skillsNeeded: ['React', 'Python', 'Healthcare APIs', 'UI/UX Accessibility'],
+    fundingNeeded: '₹12,00,000 (Govt Medtech Challenge)',
+    visibility: 'Public',
+    likesCount: 64,
+    isLiked: false,
+    isSupported: true,
+    eligibilityCriteria: [
+      { requiredSkill: 'React', minEvidence: 'PRACTICAL_VERIFIED' }
+    ],
     userJoinStatus: 'NONE',
-    createdAt: '1 week ago'
+    createdAt: '3 days ago',
+    targetUsers: 'Rural PHCs, ASHA health workers, district hospital outpatient departments',
+    businessModel: 'State public health software contract + B2B private clinic SaaS tier',
+    technologyStack: ['React', 'Python', 'FastAPI', 'FHIR / ABDM API', 'PostgreSQL', 'WebSockets'],
+    resourcesNeeded: ['Clinical sandbox access at AMTZ', 'Ethics committee approval for rural trial'],
+    mentorRequirement: 'Healthtech Regulatory Specialist & ABDM Integration Architect',
+    industrySupportNeeded: 'Pilot partnership with district health administration',
+    governmentSupportNeeded: 'AP Innovation Society & MeitY TIDE 2.0 grant linkage',
+    expectedImpact: 'Cut patient OPD wait times by 45% and eliminate repeat paper documentation for 10,000 rural residents',
+    readinessScore: 71,
+    readinessFactors: [
+      { factor: 'Problem Clarity', status: 'DONE', detail: 'Shadowed 40 consultations at 3 PHCs in Visakhapatnam district.' },
+      { factor: 'Solution Architecture', status: 'DONE', detail: 'ABDM milestone-1 consent manager integration verified.' },
+      { factor: 'Team Completeness', status: 'WARNING', detail: 'Clinical and Backend leads in place; React engineer needed.' },
+      { factor: 'Working Prototype', status: 'WARNING', detail: 'Doctor workflow mapped; student UI engineer required.' },
+      { factor: 'Validation Evidence', status: 'DONE', detail: 'Pilot approval letter obtained from regional health officer (DEMO).' },
+      { factor: 'Funding Strategy', status: 'DONE', detail: 'Grand challenge application submitted to BIRAC BIG Grant.' }
+    ],
+    verificationStatus: 'INCUBATOR_VERIFIED',
+    milestoneProgress: 60,
+    studentFriendly: true
+  }
+];
+
+export const initialFundingSchemes: StartupFundingScheme[] = [
+  {
+    id: 'scheme-start-india',
+    title: 'Startup India Seed Fund Scheme (SISFS - DEMO)',
+    provider: 'Department for Promotion of Industry and Internal Trade (DPIIT)',
+    category: 'GOVERNMENT',
+    amount: 'Up to ₹20,00,000 (Proof of Concept) / ₹50,00,000 (Commercialization)',
+    stageTarget: 'Prototype & Early Stage',
+    eligibility: 'DPIIT-recognized student startup with working prototype, DPIIT incorporation < 2 years, verified college incubator endorsement.',
+    deadline: 'Rolling Admissions (Quarterly Review)',
+    verificationBadge: 'GOVERNMENT_VERIFIED',
+    description: 'Financial assistance to student innovators for proof of concept, prototype development, product trials, market-entry and commercialization through accredited incubators across India.',
+    keyPerks: [
+      'Non-dilutive grant for PoC trials',
+      'Debentures / convertible debt for scaling',
+      'No collateral requirement for student co-founders',
+      'Mentorship access through national incubator network'
+    ],
+    applied: false
+  },
+  {
+    id: 'scheme-tide-meity',
+    title: 'MeitY TIDE 2.0 Student Entrepreneur-in-Residence (EIR - DEMO)',
+    provider: 'Ministry of Electronics & Information Technology (MeitY)',
+    category: 'GOVERNMENT',
+    amount: '₹30,000 / month stipend (12 Months) + ₹4,00,000 Prototype Grant',
+    stageTarget: 'Idea & Validation Stage',
+    eligibility: 'Final year students or recent graduates (< 2 years) with verified practical tech evidence in IoT, AI, Healthtech, or AgriTech.',
+    deadline: '30 September 2026',
+    verificationBadge: 'GOVERNMENT_VERIFIED',
+    description: 'Empowering aspiring collegiate entrepreneurs to commit full-time to tech venture validation with monthly subsistence stipend, fab-lab access, and seed prototyping grants.',
+    keyPerks: [
+      '12-month living stipend for student founder',
+      'Free lab credits & prototyping equipment',
+      '1:1 guidance from designated technology incubator',
+      'Fast-track gateway to Tier-2 angel investor demo day'
+    ],
+    applied: true
+  },
+  {
+    id: 'scheme-state-innovation',
+    title: 'Andhra Pradesh Student Innovation Fellowship (DEMO PROTOTYPE)',
+    provider: 'AP Innovation Society (APIS) & Andhra Technology Hub',
+    category: 'INSTITUTION',
+    amount: '₹5,00,000 Seed Grant + Incubation Co-working',
+    stageTarget: 'Validation & Team Building',
+    eligibility: 'Enrolled students in universities/colleges across AP with multidisciplinary verified student team and local problem statement.',
+    deadline: '15 October 2026',
+    verificationBadge: 'DEMO_DATA',
+    description: 'State-sponsored university venture challenge backing high-impact innovations in water conservation, agricultural automation, and digital education.',
+    keyPerks: [
+      'Direct grant disbursement upon milestone verification',
+      'Mentorship from senior software architects',
+      'Free co-working desk at district innovation centre',
+      'Direct booth at Annual AP Tech Innovation Expo'
+    ],
+    applied: false
+  },
+  {
+    id: 'scheme-campus-accelerator',
+    title: 'Apex Global Collegiate Accelerator & Cloud Credits (DEMO)',
+    provider: 'Apex Global Venture Labs & Cloud Alliance',
+    category: 'ACCELERATOR',
+    amount: '$10,000 Cloud Sandbox Credits + ₹10,00,000 Follow-on Pre-Seed',
+    stageTarget: 'Prototype & MVP Built',
+    eligibility: 'SaaS, AI, or Web3 student builders with live GitHub repo or verified SkillBridge code assessment proof.',
+    deadline: 'Rolling (Monthly Cohorts)',
+    verificationBadge: 'DEMO_DATA',
+    description: '10-week intensive remote accelerator covering developer relations, product-led growth, cloud infrastructure hardening, and pitch deck refinement.',
+    keyPerks: [
+      'Multi-cloud credits and GPU instance vouchers',
+      'Legal & IP trademark advisory for student ventures',
+      'Mock pitch viva with institutional seed funds',
+      'Alumni network of 120+ collegiate unicorn co-builders'
+    ],
+    applied: false
+  }
+];
+
+export const initialCandidateTalents: CandidateTalentProfile[] = [
+  {
+    id: 'talent-1',
+    name: 'Karthik Peetla',
+    college: 'Sri Sai Baba National Degree College (DEMO)',
+    degree: 'B.Sc. Computer Science Honours',
+    roleTitle: 'Full Stack / Frontend Developer',
+    verifiedSkills: ['React', 'Python', 'SQL', 'Git', 'Tailwind'],
+    evidenceLevel: 'PRACTICAL_VERIFIED',
+    practicalProjectsCount: 3,
+    experienceSnippet: 'Built responsive farmer diagnostic UI & local grocery inventory manager. Passed certified React assessment.',
+    availability: '15 hrs / week (Evenings & Weekends)',
+    matchScore: 95,
+    matchReason: 'Direct match for React & Python skills with practical code evidence and offline assessment score.',
+    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+    location: 'Anantapur, AP'
+  },
+  {
+    id: 'talent-2',
+    name: 'Sneha Kulkarni',
+    college: 'Bengaluru Advanced Technology Institute (DEMO)',
+    degree: 'B.Tech Information Technology',
+    roleTitle: 'Backend & Cloud Engineer',
+    verifiedSkills: ['Node.js', 'PostgreSQL', 'Docker', 'REST APIs'],
+    evidenceLevel: 'INDUSTRY_VERIFIED',
+    practicalProjectsCount: 4,
+    experienceSnippet: 'Completed 6-month backend internship with microservices & Redis cache deployment.',
+    availability: '20 hrs / week (Flexible)',
+    matchScore: 91,
+    matchReason: 'High industry verified backend competence for high-concurrency API and payment handling.',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
+    location: 'Bengaluru, Karnataka'
+  },
+  {
+    id: 'talent-3',
+    name: 'Manoj Varma',
+    college: 'JNTU Anantapur College of Engineering (DEMO)',
+    degree: 'B.Tech Artificial Intelligence & Data Science',
+    roleTitle: 'AI / ML Engineer',
+    verifiedSkills: ['Python', 'TensorFlow', 'FastAPI', 'Data Analytics'],
+    evidenceLevel: 'PRACTICAL_VERIFIED',
+    practicalProjectsCount: 2,
+    experienceSnippet: 'Trained localized plant leaf image classifier on 12,000 labeled samples with 93% accuracy.',
+    availability: '12 hrs / week',
+    matchScore: 89,
+    matchReason: 'Domain specialist with proven image classification pipeline and API serialization skills.',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+    location: 'Anantapur, AP'
+  },
+  {
+    id: 'talent-4',
+    name: 'Priyanka Sen',
+    college: 'National Institute of Design Sandbox (DEMO)',
+    degree: 'B.Des Interaction Design',
+    roleTitle: 'UI/UX & Product Designer',
+    verifiedSkills: ['Figma', 'User Research', 'Design Systems', 'Prototyping'],
+    evidenceLevel: 'PRACTICAL_VERIFIED',
+    practicalProjectsCount: 5,
+    experienceSnippet: 'Conducted 40+ user interviews in semi-rural villages; designed vernacular voice UX guidelines.',
+    availability: '10 hrs / week (Evenings)',
+    matchScore: 87,
+    matchReason: 'Human-centered design practitioner with field research experience in multilingual interfaces.',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    location: 'Hyderabad / Remote'
+  },
+  {
+    id: 'talent-5',
+    name: 'Vikram Singh',
+    college: 'Sri Venkateswara Institute of Tech (DEMO)',
+    degree: 'B.Com & Digital Marketing Certification',
+    roleTitle: 'Growth & Business Development',
+    verifiedSkills: ['Growth Marketing', 'SEO', 'Sales Funnel', 'Campus Outreach'],
+    evidenceLevel: 'ASSESSMENT_PASSED',
+    practicalProjectsCount: 2,
+    experienceSnippet: 'Onboarded 45 retail merchants for local student discount card program in 3 weeks.',
+    availability: '18 hrs / week',
+    matchScore: 82,
+    matchReason: 'Grassroots merchant onboarding and customer acquisition specialist with proven offline conversion.',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+    location: 'Tirupati / Hybrid'
   }
 ];
 

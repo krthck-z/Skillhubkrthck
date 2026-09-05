@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   User,
   Award,
@@ -13,23 +13,58 @@ import {
   ExternalLink,
   Trash2,
   RefreshCw,
-  Clock
+  Clock,
+  FolderGit2,
+  FileText,
+  Plus,
+  Github,
+  Globe,
+  Printer,
+  Share2,
+  Check
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { StudentProjectItem } from '../types';
+import { StudentPublicProfileModal } from '../components/modals/StudentPublicProfileModal';
+import { initialStudentDirectory } from '../data/studentProjectsData';
 
 export const ProfileView: React.FC = () => {
   const {
     profile,
+    studentProjects,
+    addStudentProject,
     achievements,
     mailMessages,
     markMailAsRead,
     offlineBookings,
     setActiveOfflineModalSkill,
     setTargetCareer,
-    showToast
+    showToast,
+    activeTab,
+    setActiveTab
   } = useApp();
 
-  const [activeSubTab, setActiveSubTab] = useState<'OVERVIEW' | 'ACHIEVEMENTS' | 'MAILBOX'>('OVERVIEW');
+  // Initialize subtab based on navigation context
+  const [activeSubTab, setActiveSubTab] = useState<'PORTFOLIO' | 'RESUME' | 'ACHIEVEMENTS' | 'READINESS' | 'MAILBOX'>('PORTFOLIO');
+  const [isAddProjectModalOpen, setIsAddProjectModalOpen] = useState(false);
+  const [isPublicProfileModalOpen, setIsPublicProfileModalOpen] = useState(false);
+
+  // Sync with main navigation tab if directly routed
+  useEffect(() => {
+    if (activeTab === 'portfolio') {
+      setActiveSubTab('PORTFOLIO');
+    } else if (activeTab === 'achievements') {
+      setActiveSubTab('ACHIEVEMENTS');
+    }
+  }, [activeTab]);
+
+  // Project form state
+  const [newTitle, setNewTitle] = useState('');
+  const [newDesc, setNewDesc] = useState('');
+  const [newGithub, setNewGithub] = useState('');
+  const [newLiveUrl, setNewLiveUrl] = useState('');
+  const [newSkills, setNewSkills] = useState('React, TypeScript, Tailwind CSS');
+  const [newEvidenceLevel, setNewEvidenceLevel] = useState<StudentProjectItem['evidenceLevel']>('GITHUB_VERIFIED');
 
   const careerOptions = [
     'Full Stack Developer',
@@ -38,10 +73,32 @@ export const ProfileView: React.FC = () => {
     'Cloud & DevOps Specialist'
   ];
 
+  const handleAddProject = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTitle.trim()) return;
+
+    addStudentProject({
+      title: newTitle,
+      description: newDesc,
+      skills: newSkills.split(',').map((s) => s.trim()),
+      githubUrl: newGithub || 'https://github.com/karthikpeetla/sample-repo',
+      liveUrl: newLiveUrl || undefined,
+      evidenceLevel: newEvidenceLevel,
+      vivaDefenseVerified: true,
+      verifiedDate: new Date().toISOString().split('T')[0]
+    });
+
+    setIsAddProjectModalOpen(false);
+    setNewTitle('');
+    setNewDesc('');
+    setNewGithub('');
+    setNewLiveUrl('');
+  };
+
   return (
-    <div className="space-y-6 pb-12 animate-in fade-in duration-200">
+    <div className="space-y-6 pb-16 animate-in fade-in duration-200">
       
-      {/* Profile Identity Card */}
+      {/* Central Identity Card */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-2xs">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="flex items-start gap-4">
@@ -54,6 +111,9 @@ export const ProfileView: React.FC = () => {
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Evidence Verified
                 </span>
+                <span className="text-xs font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                  ID: #SB-AP-2026-9941
+                </span>
               </div>
               <p className="text-xs sm:text-sm text-slate-600 mt-1">
                 {profile.degree} • {profile.institution}
@@ -61,14 +121,14 @@ export const ProfileView: React.FC = () => {
               <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 mt-2">
                 <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5 text-slate-400" /> {profile.location}</span>
                 <span>•</span>
-                <span>Roll ID: <strong className="text-slate-700 font-mono">22001A0589</strong></span>
+                <span>Roll ID: <strong className="text-slate-700 font-mono">{profile.enrollmentNumber || '22SSBN049'}</strong></span>
                 <span>•</span>
                 <span>Batch: <strong>2022–2026</strong></span>
               </div>
             </div>
           </div>
 
-          {/* Target Career Switcher (Section 36) */}
+          {/* Target Career Switcher */}
           <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 text-xs space-y-1.5 self-stretch md:self-auto min-w-[240px]">
             <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block">
               Active Target Career Goal:
@@ -90,48 +150,330 @@ export const ProfileView: React.FC = () => {
             <span className="text-[10px] text-slate-400 block">
               Recalculates skill gaps & readiness instantly.
             </span>
+            <button
+              onClick={() => setIsPublicProfileModalOpen(true)}
+              className="w-full mt-2 py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs cursor-pointer transition-all"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span>Recruiter Public Preview</span>
+            </button>
           </div>
         </div>
 
-        {/* Sub-Tab Navigation */}
-        <div className="flex items-center gap-2 mt-6 pt-4 border-t border-slate-100">
+        {/* Distinct Functional Sub-Tabs */}
+        <div className="flex flex-wrap items-center gap-2 mt-6 pt-4 border-t border-slate-100">
           <button
-            onClick={() => setActiveSubTab('OVERVIEW')}
-            className={`px-4 py-2 text-xs font-bold rounded-xl transition-colors cursor-pointer ${
-              activeSubTab === 'OVERVIEW'
+            onClick={() => setActiveSubTab('PORTFOLIO')}
+            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeSubTab === 'PORTFOLIO'
                 ? 'bg-indigo-600 text-white shadow-2xs'
                 : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            Readiness & Diagnostics
+            <FolderGit2 className="w-3.5 h-3.5" />
+            <span>Verified Portfolio ({studentProjects.length})</span>
           </button>
+
+          <button
+            onClick={() => setActiveSubTab('RESUME')}
+            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeSubTab === 'RESUME'
+                ? 'bg-indigo-600 text-white shadow-2xs'
+                : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <FileText className="w-3.5 h-3.5" />
+            <span>Verified Resume</span>
+          </button>
+
           <button
             onClick={() => setActiveSubTab('ACHIEVEMENTS')}
-            className={`px-4 py-2 text-xs font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 ${
+            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
               activeSubTab === 'ACHIEVEMENTS'
                 ? 'bg-indigo-600 text-white shadow-2xs'
                 : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
             <Award className="w-3.5 h-3.5" />
-            <span>Badges & Achievements ({achievements.filter((a) => a.unlocked).length})</span>
+            <span>Achievements & Badges ({achievements.filter((a) => a.unlocked).length})</span>
           </button>
+
+          <button
+            onClick={() => setActiveSubTab('READINESS')}
+            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+              activeSubTab === 'READINESS'
+                ? 'bg-indigo-600 text-white shadow-2xs'
+                : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            Readiness Diagnostics ({profile.careerReadiness}%)
+          </button>
+
           <button
             onClick={() => setActiveSubTab('MAILBOX')}
-            className={`px-4 py-2 text-xs font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 ${
+            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
               activeSubTab === 'MAILBOX'
                 ? 'bg-indigo-600 text-white shadow-2xs'
                 : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
             <Mail className="w-3.5 h-3.5" />
-            <span>Student Mailbox ({mailMessages.length})</span>
+            <span>Mailbox ({mailMessages.length})</span>
           </button>
         </div>
       </div>
 
-      {/* OVERVIEW SUB-TAB: Explainable Readiness Diagnostics (Section 3) */}
-      {activeSubTab === 'OVERVIEW' && (
+      {/* ========================================================================= */}
+      {/* 1. PORTFOLIO SUB-TAB: VERIFIED PROJECTS & REPOS                            */}
+      {/* ========================================================================= */}
+      {activeSubTab === 'PORTFOLIO' && (
+        <div className="space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
+            <div>
+              <h2 className="text-base font-extrabold text-slate-900">
+                Verified Projects & Code Proof
+              </h2>
+              <p className="text-xs text-slate-500">
+                Recruiters examine commit timelines, working endpoints, and oral viva defenses—not empty claims.
+              </p>
+            </div>
+
+            <button
+              onClick={() => setIsAddProjectModalOpen(true)}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer flex items-center gap-1.5 self-start sm:self-auto"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Verified Project</span>
+            </button>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {studentProjects.map((proj) => (
+              <div
+                key={proj.id}
+                className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-indigo-300 hover:shadow-sm transition-all flex flex-col justify-between space-y-4"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="text-base font-extrabold text-slate-900 line-clamp-1">
+                      {proj.title}
+                    </h3>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
+                      {proj.evidenceLevel.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    {proj.description}
+                  </p>
+
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {(proj.skillsDemonstrated || proj.skills || []).map((s) => (
+                      <span
+                        key={s}
+                        className="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-800 text-[11px] font-semibold border border-indigo-100"
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-3">
+                    <a
+                      href={proj.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1"
+                    >
+                      <Github className="w-3.5 h-3.5" />
+                      <span>Code</span>
+                    </a>
+
+                    {proj.liveUrl && (
+                      <a
+                        href={proj.liveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-indigo-600 hover:text-indigo-800 font-semibold flex items-center gap-1"
+                      >
+                        <Globe className="w-3.5 h-3.5" />
+                        <span>Live Demo</span>
+                      </a>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-1 text-[11px] text-emerald-700 font-bold">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>Viva Verified</span>
+                  </div>
+                </div>
+
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 2. RESUME SUB-TAB: VERIFIED EVIDENCE RESUME                                */}
+      {/* ========================================================================= */}
+      {activeSubTab === 'RESUME' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between bg-white p-4 rounded-2xl border border-slate-200">
+            <div>
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+                Official SkillBridge Verified Resume
+              </span>
+              <span className="text-xs text-slate-400">
+                Sharable digital credential backed by proctored telemetry
+              </span>
+            </div>
+            <button
+              onClick={() => showToast('Resume exported as authenticated PDF with verification QR.')}
+              className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              <span>Export Authenticated PDF</span>
+            </button>
+          </div>
+
+          {/* Formatted Resume Preview */}
+          <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-md space-y-6 max-w-4xl mx-auto">
+            {/* Resume Header */}
+            <div className="border-b border-slate-200 pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h1 className="text-2xl font-black text-slate-900 tracking-tight">{profile.name}</h1>
+                <p className="text-sm font-semibold text-indigo-700 mt-0.5">
+                  Aspiring {profile.targetCareer} • Anantapur, Andhra Pradesh
+                </p>
+                <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 mt-2">
+                  <span>karthik.peetla@skillbridge.edu</span>
+                  <span>•</span>
+                  <span>+91 98765 43210</span>
+                  <span>•</span>
+                  <span>Roll: {profile.enrollmentNumber}</span>
+                </div>
+              </div>
+
+              <div className="bg-emerald-50 border border-emerald-300 rounded-2xl p-3 text-right self-start sm:self-auto">
+                <span className="text-[10px] font-black uppercase text-emerald-800 block">
+                  SkillBridge Verified Passport
+                </span>
+                <span className="text-xs font-mono font-bold text-emerald-950">
+                  #SB-AP-2026-9941
+                </span>
+                <span className="text-[10px] text-emerald-700 block mt-0.5">
+                  100% Anti-Fraud Audit Stamped
+                </span>
+              </div>
+            </div>
+
+            {/* Education */}
+            <div className="space-y-2 text-xs">
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Education</h3>
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="font-bold text-slate-900 text-sm">{profile.institution}</h4>
+                  <p className="text-slate-600">{profile.degree}</p>
+                </div>
+                <span className="text-slate-500 font-mono">2022 – 2026 (CGPA: 8.4/10)</span>
+              </div>
+            </div>
+
+            {/* Verified Skills Matrix */}
+            <div className="space-y-2 text-xs">
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">
+                Verified Technical Proficiencies (Viva & Sandbox Passed)
+              </h3>
+              <div className="grid sm:grid-cols-2 gap-2">
+                <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                  <span className="font-bold text-slate-900 block">Frontend & UI Engineering</span>
+                  <span className="text-slate-600 text-[11px]">React 19, TypeScript, JavaScript ES6+, Tailwind CSS, Responsive DOM</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                  <span className="font-bold text-slate-900 block">Backend & APIs</span>
+                  <span className="text-slate-600 text-[11px]">Node.js, Express, RESTful Design, Idempotency, SQL Queries</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                  <span className="font-bold text-slate-900 block">Architecture & Testing</span>
+                  <span className="text-slate-600 text-[11px]">Component Lifecycle, State Machines, Git Branching, Jest Unit Testing</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                  <span className="font-bold text-slate-900 block">Regional & Domain Knowledge</span>
+                  <span className="text-slate-600 text-[11px]">AgriTech Grounding, Mobile-first Offline PWA, Cloud Deployment</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Verified Projects */}
+            <div className="space-y-3 text-xs">
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">
+                Verified Projects (with Live Demos & Code Defense)
+              </h3>
+              {studentProjects.map((p) => (
+                <div key={p.id} className="border-b border-slate-100 pb-3 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-slate-900 text-sm">{p.title}</span>
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      {p.evidenceLevel.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+                  <p className="text-slate-600 leading-relaxed">{p.description}</p>
+                  <p className="text-[11px] text-indigo-700 font-semibold">
+                    Tech Stack: {(p.skillsDemonstrated || p.skills || []).join(', ')} • Repo: {p.githubUrl}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 3. ACHIEVEMENTS SUB-TAB                                                   */}
+      {/* ========================================================================= */}
+      {activeSubTab === 'ACHIEVEMENTS' && (
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {achievements.map((ach) => (
+            <div
+              key={ach.id}
+              className={`p-5 rounded-2xl border transition-all flex flex-col justify-between ${
+                ach.unlocked
+                  ? 'bg-white border-slate-200 shadow-2xs'
+                  : 'bg-slate-50 border-slate-200 opacity-60'
+              }`}
+            >
+              <div>
+                <div className="flex items-start justify-between gap-2">
+                  <span className="text-2xl">{ach.badgeIcon}</span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    ach.unlocked
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : 'bg-slate-200 text-slate-600'
+                  }`}>
+                    {ach.unlocked ? 'Unlocked ✓' : 'In Progress'}
+                  </span>
+                </div>
+
+                <h3 className="font-bold text-slate-900 text-sm mt-3">{ach.title}</h3>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">{ach.description}</p>
+              </div>
+
+              <div className="mt-4 pt-2 border-t border-slate-100 text-[11px] text-slate-400">
+                {ach.unlocked ? `Achieved on ${ach.unlockedAt}` : 'Complete verification requirements to unlock'}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 4. READINESS DIAGNOSTICS SUB-TAB                                          */}
+      {/* ========================================================================= */}
+      {activeSubTab === 'READINESS' && (
         <div className="space-y-6">
           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-2xs space-y-4">
             <div className="flex items-center justify-between">
@@ -149,7 +491,7 @@ export const ProfileView: React.FC = () => {
             </div>
 
             <p className="text-xs text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200/80">
-              "Never show a hollow mystery score. Your 72% readiness reflects: verified skills (70%), objective assessments passed (75%), code sandbox defense (60%), startup & real-world projects (40%), oral viva communication (80%), and current framework alignment (85%). Closing your React & Node.js practical gap will elevate your score to 88%."
+              "Never show a hollow mystery score. Your {profile.careerReadiness}% readiness reflects: verified skills ({profile.readinessBreakdown.skills}%), objective assessments passed ({profile.readinessBreakdown.assessment}%), code sandbox defense ({profile.readinessBreakdown.practical}%), startup & real-world projects ({profile.readinessBreakdown.experience}%), oral viva communication ({profile.readinessBreakdown.communication}%), and current framework alignment ({profile.readinessBreakdown.industryAlignment}%)."
             </p>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-2">
@@ -202,80 +544,12 @@ export const ProfileView: React.FC = () => {
               </div>
             </div>
           </div>
-
-          {/* Active Offline Bookings Card */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-2xs space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-indigo-600" />
-                <h3 className="font-bold text-base text-slate-900">Offline Assessment Reservations</h3>
-              </div>
-              <button
-                onClick={() => setActiveOfflineModalSkill('React')}
-                className="text-xs font-bold text-indigo-600 hover:text-indigo-800"
-              >
-                + Book New Slot
-              </button>
-            </div>
-
-            {offlineBookings.length > 0 ? (
-              <div className="space-y-2">
-                {offlineBookings.map((b) => (
-                  <div key={b.id} className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                    <div>
-                      <span className="font-extrabold text-slate-900 text-sm">{b.skillName} In-Person Proctored Test</span>
-                      <p className="text-slate-600 mt-0.5">{b.venue}, {b.city} • {b.date} ({b.time})</p>
-                    </div>
-                    <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 self-start sm:self-auto">
-                      {b.status}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-xs text-slate-500 py-3">No active bookings yet.</p>
-            )}
-          </div>
         </div>
       )}
 
-      {/* ACHIEVEMENTS SUB-TAB (Section 38) */}
-      {activeSubTab === 'ACHIEVEMENTS' && (
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {achievements.map((ach) => (
-            <div
-              key={ach.id}
-              className={`p-5 rounded-2xl border transition-all flex flex-col justify-between ${
-                ach.unlocked
-                  ? 'bg-white border-slate-200 shadow-2xs'
-                  : 'bg-slate-50 border-slate-200 opacity-60'
-              }`}
-            >
-              <div>
-                <div className="flex items-start justify-between gap-2">
-                  <span className="text-2xl">{ach.badgeIcon}</span>
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                    ach.unlocked
-                      ? 'bg-emerald-100 text-emerald-800'
-                      : 'bg-slate-200 text-slate-600'
-                  }`}>
-                    {ach.unlocked ? 'Unlocked ✓' : 'In Progress'}
-                  </span>
-                </div>
-
-                <h3 className="font-bold text-slate-900 text-sm mt-3">{ach.title}</h3>
-                <p className="text-xs text-slate-500 mt-1 leading-relaxed">{ach.description}</p>
-              </div>
-
-              <div className="mt-4 pt-2 border-t border-slate-100 text-[11px] text-slate-400">
-                {ach.unlocked ? `Achieved on ${ach.unlockedAt}` : 'Complete verification requirements to unlock'}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* MAILBOX SUB-TAB (Section 39) */}
+      {/* ========================================================================= */}
+      {/* 5. MAILBOX SUB-TAB                                                        */}
+      {/* ========================================================================= */}
       {activeSubTab === 'MAILBOX' && (
         <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden divide-y divide-slate-100">
           <div className="p-5 bg-slate-50 flex items-center justify-between">
@@ -317,6 +591,138 @@ export const ProfileView: React.FC = () => {
             </div>
           ))}
         </div>
+      )}
+
+      {/* MODAL: ADD VERIFIED PROJECT */}
+      {isAddProjectModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <FolderGit2 className="w-4 h-4 text-indigo-600" />
+                <h3 className="text-base font-extrabold text-slate-900">
+                  Add Project to Verified Portfolio
+                </h3>
+              </div>
+              <button
+                onClick={() => setIsAddProjectModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 text-sm font-bold cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleAddProject} className="space-y-4 pt-3 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Project Title *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. AgriSmart IoT Farmer Advisory Dashboard"
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-medium outline-none focus:border-indigo-600"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Description & Impact *
+                </label>
+                <textarea
+                  required
+                  rows={2}
+                  placeholder="Describe what the project does, real users, and key engineering challenges solved..."
+                  value={newDesc}
+                  onChange={(e) => setNewDesc(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-medium outline-none focus:border-indigo-600"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    GitHub Repo URL
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://github.com/..."
+                    value={newGithub}
+                    onChange={(e) => setNewGithub(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-medium outline-none focus:border-indigo-600"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Live Demo URL (optional)
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://..."
+                    value={newLiveUrl}
+                    onChange={(e) => setNewLiveUrl(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-medium outline-none focus:border-indigo-600"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Skills / Tech Stack
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="React, TypeScript, Node.js"
+                    value={newSkills}
+                    onChange={(e) => setNewSkills(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-medium outline-none focus:border-indigo-600"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Evidence Level
+                  </label>
+                  <select
+                    value={newEvidenceLevel}
+                    onChange={(e) => setNewEvidenceLevel(e.target.value as any)}
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-medium outline-none cursor-pointer"
+                  >
+                    <option value="LIVE_PRODUCTION">Live in Production (Highest)</option>
+                    <option value="GITHUB_VERIFIED">GitHub Verified Code</option>
+                    <option value="COMPLETED">Completed Sandbox</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsAddProjectModalOpen(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg cursor-pointer shadow-xs"
+                >
+                  Save to Portfolio
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Public Recruiter Modal */}
+      {isPublicProfileModalOpen && (
+        <StudentPublicProfileModal
+          student={initialStudentDirectory[0]}
+          onClose={() => setIsPublicProfileModalOpen(false)}
+        />
       )}
 
     </div>

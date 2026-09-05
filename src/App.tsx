@@ -6,7 +6,6 @@
 import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Navbar } from './components/Navbar';
-import { NavigationTabs } from './components/NavigationTabs';
 
 // Views
 import { StudentHomeView } from './views/StudentHomeView';
@@ -19,9 +18,23 @@ import { OpportunitiesView } from './views/OpportunitiesView';
 import { StartupsView } from './views/StartupsView';
 import { IndustryView } from './views/IndustryView';
 import { InstitutionsView } from './views/InstitutionsView';
+import { InstitutionDashboardView } from './views/InstitutionDashboardView';
+import { StartupDashboardView } from './views/StartupDashboardView';
 import { ScholarshipsView } from './views/ScholarshipsView';
 import { TechnologyView } from './views/TechnologyView';
 import { ProfileView } from './views/ProfileView';
+import { MailboxView } from './views/MailboxView';
+import { LocalJobsView } from './views/LocalJobsView';
+import { PodcastsMeetupsView } from './views/PodcastsMeetupsView';
+import { ContactsNetworkView } from './views/ContactsNetworkView';
+import { EcosystemMapView } from './views/EcosystemMapView';
+import { DiscoverView } from './views/DiscoverView';
+import { ProjectHubView } from './views/ProjectHubView';
+import { MessagesView } from './views/MessagesView';
+import { EcosystemHubView } from './views/EcosystemHubView';
+import { FacultyAcademiaView } from './views/FacultyAcademiaView';
+import { IndustryHiringView } from './views/IndustryHiringView';
+import { Footer } from './components/Footer';
 
 // Modals
 import { GlobalSearchModal } from './components/modals/GlobalSearchModal';
@@ -30,18 +43,28 @@ import { OfflineBookingModal } from './components/modals/OfflineBookingModal';
 import { AssessmentModal } from './components/modals/AssessmentModal';
 import { OpportunityDetailModal } from './components/modals/OpportunityDetailModal';
 import { TrainForJobModal } from './components/modals/TrainForJobModal';
+import { GoogleMapsKeyModal } from './components/maps/GoogleMapsKeyModal';
+import { GoogleMapsProvider } from './components/maps/GoogleMapsContext';
 
 // Icons & UI
 import { ShieldCheck, Sparkles, Heart, Building2, GraduationCap, Users } from 'lucide-react';
 
 const MainContent: React.FC = () => {
   const { activeTab, role, toastMessage, profile, setActiveTab } = useApp();
-  const currentRole = role || 'STUDENT';
+  const currentRole = role || 'student';
 
   const renderActiveView = () => {
     switch (activeTab) {
       case 'home':
+        if (currentRole === 'institute') return <InstitutionDashboardView />;
+        if (currentRole === 'startup') return <StartupDashboardView />;
+        if (currentRole === 'industry') return <IndustryView />;
         return <StudentHomeView />;
+      case 'discover':
+        return <DiscoverView />;
+      case 'projects':
+      case 'project-hub':
+        return <ProjectHubView />;
       case 'career-map':
         return <CareerMapView />;
       case 'skills':
@@ -55,16 +78,45 @@ const MainContent: React.FC = () => {
       case 'opportunities':
         return <OpportunitiesView />;
       case 'startups':
+        if (currentRole === 'startup') return <StartupDashboardView />;
         return <StartupsView />;
       case 'industry':
+      case 'industry-hiring':
+      case 'fast-match':
+      case 'companies':
+      case 'talent-search':
         return <IndustryView />;
+      case 'faculty':
+      case 'academia':
+        return <FacultyAcademiaView />;
+      case 'messages':
+      case 'chat':
+        return <MessagesView />;
+      case 'ecosystem':
+      case 'ecosystem-hub':
+        return <EcosystemHubView />;
       case 'institutions':
+        if (currentRole === 'institute') return <InstitutionDashboardView />;
         return <InstitutionsView />;
+      case 'mentors':
+      case 'contacts':
+        return <ContactsNetworkView />;
+      case 'local-jobs':
+        return <LocalJobsView />;
+      case 'map':
+      case 'ecosystem-map':
+        return <EcosystemMapView />;
+      case 'podcasts':
+        return <PodcastsMeetupsView />;
       case 'scholarships':
         return <ScholarshipsView />;
       case 'technology':
         return <TechnologyView />;
+      case 'mailbox':
+        return <MailboxView />;
       case 'profile':
+      case 'achievements':
+      case 'portfolio':
         return <ProfileView />;
       default:
         return <StudentHomeView />;
@@ -74,60 +126,56 @@ const MainContent: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-indigo-500 selection:text-white text-slate-800">
       
-      {/* Top Navbar with Role Switcher & System Indicators */}
+      {/* Top Unified Navbar with Brand, Navigation, Search, Tools & Role Switcher */}
       <Navbar />
-
-      {/* Primary Navigation Pill Tabs */}
-      <NavigationTabs />
 
       {/* Perspective / Role Banner (If switched to Industry, Institution, or Startup) */}
       {currentRole !== 'student' && (
-        <div className="bg-indigo-950 text-indigo-100 border-b border-indigo-800 px-4 py-2.5 text-xs">
-          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div className="bg-indigo-950 text-indigo-100 border-b border-indigo-800 py-2.5 text-xs">
+          <div className="app-container flex flex-col sm:flex-row items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
               <span>
-                Simulating perspective as <strong className="capitalize">{currentRole}</strong>: You can inspect verified candidate portfolios, audit institution benchmarks, and review active talent feeds.
+                Active Perspective: <strong className="capitalize text-white">{currentRole}</strong> — Viewing authenticated benchmarks, candidate portfolios, and departmental analytics.
               </span>
             </div>
-            <button
-              onClick={() => {
-                if (currentRole === 'industry') setActiveTab('industry');
-                else if (currentRole === 'institute') setActiveTab('institutions');
-                else if (currentRole === 'startup') setActiveTab('startups');
-                else setActiveTab('home');
-              }}
-              className="text-xs font-bold text-amber-300 hover:text-white underline cursor-pointer"
-            >
-              Jump to {(currentRole || '').replace(/_/g, ' ')} view →
-            </button>
+            <div className="flex items-center gap-3">
+              {currentRole === 'institute' && (
+                <button
+                  onClick={() => setActiveTab('institutions')}
+                  className="text-xs font-bold text-amber-300 hover:text-white underline cursor-pointer"
+                >
+                  View Colleges Directory →
+                </button>
+              )}
+              {currentRole === 'startup' && (
+                <button
+                  onClick={() => setActiveTab('startups')}
+                  className="text-xs font-bold text-amber-300 hover:text-white underline cursor-pointer"
+                >
+                  View Startup Ideas Hub →
+                </button>
+              )}
+              {currentRole === 'industry' && (
+                <button
+                  onClick={() => setActiveTab('industry')}
+                  className="text-xs font-bold text-amber-300 hover:text-white underline cursor-pointer"
+                >
+                  48h Candidate Matrix →
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
 
       {/* Main Viewport Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 pt-6">
+      <main className="flex-1 app-container pt-6 pb-12">
         {renderActiveView()}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-8 text-xs text-slate-500 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5">
-            <div className="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-black text-xs">
-              SB
-            </div>
-            <span className="font-extrabold text-slate-800 tracking-tight">
-              SKILLBRIDGE AI
-            </span>
-            <span>• Evidence-Driven Ecosystem</span>
-          </div>
-
-          <p className="text-center sm:text-right text-[11px] text-slate-400">
-            Bridging students, higher education, local industry, and startups through authenticated capability.
-          </p>
-        </div>
-      </footer>
+      {/* Global Footer */}
+      <Footer />
 
       {/* Global Modals */}
       <GlobalSearchModal />
@@ -136,6 +184,7 @@ const MainContent: React.FC = () => {
       <AssessmentModal />
       <OpportunityDetailModal />
       <TrainForJobModal />
+      <GoogleMapsKeyModal />
 
       {/* Global Toast Notification */}
       {toastMessage && (
@@ -154,7 +203,9 @@ const MainContent: React.FC = () => {
 export default function App() {
   return (
     <AppProvider>
-      <MainContent />
+      <GoogleMapsProvider>
+        <MainContent />
+      </GoogleMapsProvider>
     </AppProvider>
   );
 }

@@ -13,12 +13,40 @@ import {
   ScholarshipItem,
   InstitutionItem,
   StartupIdea,
+  StartupTeamMember,
+  StartupOpenRole,
+  StartupApplicant,
+  StartupFundingScheme,
+  CandidateTalentProfile,
   MentorItem,
   AchievementItem,
   MailMessage,
   AppNotification,
-  TechnologyTrend
+  TechnologyTrend,
+  SkillBridgeContact,
+  LocalPartTimeJob,
+  PodcastEpisode,
+  OfflineMeetup,
+  LiveInteractionSession,
+  FeeReportItem,
+  StudentProjectItem,
+  FastRecruitmentRequirement,
+  FastMatchCandidateComparison,
+  ProjectHubItem,
+  ChatConversation,
+  ChatMessage,
+  ChatMessageAttachment,
+  ConversationType,
+  IndustryHiringOpportunity,
+  FacultyOpportunityItem,
+  StudentDirectoryItem
 } from '../types';
+import { initialProjectHub, initialStudentDirectory } from '../data/studentProjectsData';
+import {
+  initialChatConversations,
+  initialIndustryHiringOpportunities,
+  initialFacultyOpportunities
+} from '../data/industryAcademiaData';
 import {
   initialStudentProfile,
   initialSkills,
@@ -30,12 +58,32 @@ import {
   initialScholarships,
   initialInstitutions,
   initialStartupIdeas,
+  initialFundingSchemes,
+  initialCandidateTalents,
   initialMentors,
   initialAchievements,
   initialMailMessages,
   initialNotifications,
   initialTechnologyTrends
 } from '../data/mockData';
+import {
+  initialAnantapurInstitutions,
+  initialFeeReports
+} from '../data/institutionsData';
+import { initialStudentProjects } from '../data/portfolioData';
+import {
+  initialFastRecruitmentRequirements,
+  initialCandidateComparisons
+} from '../data/fastRecruitmentData';
+import {
+  initialSkillBridgeContacts,
+  initialLocalPartTimeJobs,
+  initialPodcastEpisodes,
+  initialOfflineMeetups,
+  initialLiveSessions,
+  initialVerifiedFreeLearning,
+  initialExtendedMailMessages
+} from '../data/ecosystemData';
 
 interface AppContextType {
   role: UserRole;
@@ -54,6 +102,8 @@ interface AppContextType {
   scholarships: ScholarshipItem[];
   institutions: InstitutionItem[];
   startupIdeas: StartupIdea[];
+  fundingSchemes: StartupFundingScheme[];
+  candidateTalents: CandidateTalentProfile[];
   mentors: MentorItem[];
   achievements: AchievementItem[];
   mailMessages: MailMessage[];
@@ -88,7 +138,12 @@ interface AppContextType {
   applyToScholarship: (id: string) => void;
   toggleLikeStartup: (id: string) => void;
   toggleSupportStartup: (id: string) => void;
-  joinStartupTeam: (id: string) => boolean;
+  joinStartupTeam: (id: string, role?: string, intro?: string) => boolean;
+  applyToStartupRole: (startupId: string, roleTitle: string, intro: string) => void;
+  handleStartupApplicantAction: (startupId: string, applicantId: string, action: 'ACCEPT' | 'REJECT') => void;
+  applyStartupFundingScheme: (schemeId: string) => void;
+  inviteTalentToTeam: (startupId: string, talentId: string, roleTitle: string) => void;
+  verifyStartupMilestone: (startupId: string, milestoneName: string, notes?: string) => void;
   createStartupIdea: (idea: Partial<StartupIdea>) => void;
   requestMentorship: (mentorId: string) => void;
   addTrendToCareerMap: (trendId: string) => void;
@@ -97,6 +152,93 @@ interface AppContextType {
   deleteMail: (id: string) => void;
   markNotificationAsRead: (id: string) => void;
   revalidateSkill: (skillId: string) => void;
+
+  // Ecosystem Extensions
+  contacts: SkillBridgeContact[];
+  localJobs: LocalPartTimeJob[];
+  podcasts: PodcastEpisode[];
+  offlineMeetups: OfflineMeetup[];
+  liveSessions: LiveInteractionSession[];
+  
+  // Mailbox Operations
+  sendMail: (mail: {
+    recipient: string;
+    recipientRole?: string;
+    recipientHandle?: string;
+    subject: string;
+    body: string;
+    category?: MailMessage['category'];
+    priority?: 'NORMAL' | 'HIGH' | 'URGENT';
+    attachments?: { name: string; size: string; type: string }[];
+  }) => void;
+  replyMail: (mailId: string, replyBody: string, replyAll?: boolean) => void;
+  forwardMail: (mailId: string, toRecipient: string, forwardNote?: string) => void;
+  toggleStarMail: (id: string) => void;
+  toggleImportantMail: (id: string) => void;
+  markMailUnread: (id: string) => void;
+  archiveMail: (id: string) => void;
+  trashMail: (id: string) => void;
+  restoreMail: (id: string) => void;
+  emptyTrash: () => void;
+
+  // Contacts
+  requestContact: (contactId: string, message?: string) => void;
+  updateContactStatus: (contactId: string, status: 'ACCEPTED' | 'DECLINED' | 'BLOCKED') => void;
+
+  // Local Jobs
+  applyLocalJob: (jobId: string, pitch?: string) => void;
+  toggleSaveLocalJob: (jobId: string) => void;
+  withdrawLocalJob: (jobId: string) => void;
+
+  // Podcasts & Meetups
+  registerMeetup: (meetupId: string) => void;
+  registerLiveSession: (sessionId: string) => void;
+  submitLiveQuestion: (sessionId: string, question: string) => void;
+
+  // Fee Reporting & Institutions
+  feeReports: FeeReportItem[];
+  submitFeeReport: (report: Omit<FeeReportItem, 'id' | 'status' | 'createdAt'>) => void;
+
+  // Portfolio Projects
+  studentProjects: StudentProjectItem[];
+  addStudentProject: (project: Omit<StudentProjectItem, 'id'>) => void;
+
+  // Fast Recruitment
+  fastRequirements: FastRecruitmentRequirement[];
+  addFastRequirement: (req: Omit<FastRecruitmentRequirement, 'id'>) => void;
+  candidateComparisons: Record<string, FastMatchCandidateComparison[]>;
+  toggleCandidateShortlist: (reqId: string, candidateId: string) => void;
+  hireCandidate: (reqId: string, candidateId: string) => void;
+
+  // Collaborative Project Hub
+  hubProjects: ProjectHubItem[];
+  setHubProjects: React.Dispatch<React.SetStateAction<ProjectHubItem[]>>;
+
+  // Messages & Real-Time Direct Chat
+  chatConversations: ChatConversation[];
+  activeConversationId: string | null;
+  setActiveConversationId: (id: string | null) => void;
+  sendChatMessage: (conversationId: string, text: string, attachment?: ChatMessageAttachment) => void;
+  openChatWithUser: (user: { id: string; name: string; role: string; org?: string; avatar?: string; type?: ConversationType }) => void;
+  inviteToProjectInChat: (conversationId: string, projectTitle: string, note?: string) => void;
+  shareOpportunityInChat: (conversationId: string, opportunityTitle: string, subtitle?: string) => void;
+  markConversationAsRead: (conversationId: string) => void;
+  unreadChatCount: number;
+
+  // Industry Hiring
+  industryHiringOpportunities: IndustryHiringOpportunity[];
+  applyToIndustryOpportunity: (oppId: string) => void;
+  toggleSaveIndustryOpportunity: (oppId: string) => void;
+
+  // Faculty & Academia Collaboration
+  facultyOpportunities: FacultyOpportunityItem[];
+  applyToFacultyOpportunity: (oppId: string) => void;
+
+  // Student Directory & Connection States
+  studentDirectory: StudentDirectoryItem[];
+  toggleStudentConnection: (studentId: string) => void;
+  inviteStudentToProject: (studentId: string, projectId: string, note: string) => void;
+  inviteStudentToStartup: (studentId: string, startupId: string, roleTitle: string, note: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -107,19 +249,45 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [profile, setProfile] = useState<StudentProfile>(initialStudentProfile);
   const [skills, setSkills] = useState<SkillItem[]>(initialSkills);
   const [careerNodes, setCareerNodes] = useState<CareerNode[]>(initialCareerNodes);
-  const [learningResources, setLearningResources] = useState<LearningResource[]>(initialLearningResources);
+  const [learningResources, setLearningResources] = useState<LearningResource[]>([
+    ...initialLearningResources,
+    ...initialVerifiedFreeLearning
+  ]);
   const [assessments, setAssessments] = useState<AssessmentItem[]>(initialAssessments);
   const [offlineBookings, setOfflineBookings] = useState<OfflineAssessmentBooking[]>([]);
   const [opportunities, setOpportunities] = useState<OpportunityItem[]>(initialOpportunities);
   const [trainForJobRoute, setTrainForJobRoute] = useState<TrainForJobRoute>(initialTrainForJobRoute);
   const [scholarships, setScholarships] = useState<ScholarshipItem[]>(initialScholarships);
-  const [institutions] = useState<InstitutionItem[]>(initialInstitutions);
+  const [institutions] = useState<InstitutionItem[]>(initialAnantapurInstitutions);
+  const [feeReports, setFeeReports] = useState<FeeReportItem[]>(initialFeeReports);
+  const [studentProjects, setStudentProjects] = useState<StudentProjectItem[]>(initialStudentProjects);
+  const [fastRequirements, setFastRequirements] = useState<FastRecruitmentRequirement[]>(initialFastRecruitmentRequirements);
+  const [candidateComparisons, setCandidateComparisons] = useState<Record<string, FastMatchCandidateComparison[]>>(initialCandidateComparisons);
   const [startupIdeas, setStartupIdeas] = useState<StartupIdea[]>(initialStartupIdeas);
+  const [fundingSchemes, setFundingSchemes] = useState<StartupFundingScheme[]>(initialFundingSchemes);
+  const [candidateTalents, setCandidateTalents] = useState<CandidateTalentProfile[]>(initialCandidateTalents);
   const [mentors, setMentors] = useState<MentorItem[]>(initialMentors);
   const [achievements, setAchievements] = useState<AchievementItem[]>(initialAchievements);
-  const [mailMessages, setMailMessages] = useState<MailMessage[]>(initialMailMessages);
+  const [mailMessages, setMailMessages] = useState<MailMessage[]>(initialExtendedMailMessages);
   const [notifications, setNotifications] = useState<AppNotification[]>(initialNotifications);
   const [techTrends, setTechTrends] = useState<TechnologyTrend[]>(initialTechnologyTrends);
+
+  // New Ecosystem States
+  const [contacts, setContacts] = useState<SkillBridgeContact[]>(initialSkillBridgeContacts);
+  const [localJobs, setLocalJobs] = useState<LocalPartTimeJob[]>(initialLocalPartTimeJobs);
+  const [podcasts, setPodcasts] = useState<PodcastEpisode[]>(initialPodcastEpisodes);
+  const [offlineMeetups, setOfflineMeetups] = useState<OfflineMeetup[]>(initialOfflineMeetups);
+  const [liveSessions, setLiveSessions] = useState<LiveInteractionSession[]>(initialLiveSessions);
+  const [hubProjects, setHubProjects] = useState<ProjectHubItem[]>(initialProjectHub);
+
+  // Messages, Industry Hiring, Faculty, and Directory States
+  const [chatConversations, setChatConversations] = useState<ChatConversation[]>(initialChatConversations);
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(initialChatConversations[0]?.id || null);
+  const [industryHiringOpportunities, setIndustryHiringOpportunities] = useState<IndustryHiringOpportunity[]>(initialIndustryHiringOpportunities);
+  const [facultyOpportunities, setFacultyOpportunities] = useState<FacultyOpportunityItem[]>(initialFacultyOpportunities);
+  const [studentDirectory, setStudentDirectory] = useState<StudentDirectoryItem[]>(initialStudentDirectory);
+
+  const unreadChatCount = chatConversations.reduce((sum, c) => sum + (c.unreadCount || 0), 0);
 
   // Modals & Triggers
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -551,84 +719,276 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast('Startup supported!');
   };
 
-  const joinStartupTeam = (id: string): boolean => {
+  const joinStartupTeam = (id: string, roleTitle?: string, intro?: string): boolean => {
     const startup = startupIdeas.find((s) => s.id === id);
     if (!startup) return false;
 
-    // Check Student eligibility against criteria
-    // Student has Python (INDUSTRY_VERIFIED) and React (CERTIFICATE_VERIFIED or better)
-    const meetsCriteria = true; // Karthik meets the AI Agriculture Assistant criteria!
+    const assignedRole = roleTitle || 'React Frontend Developer';
 
-    if (meetsCriteria) {
+    const newMember: StartupTeamMember = {
+      id: `tm-user-${Date.now()}`,
+      name: profile.name,
+      role: assignedRole,
+      verifiedSkills: ['React', 'Python', 'SQL', 'Git'],
+      evidenceLevel: 'PRACTICAL_VERIFIED',
+      joinedAt: 'Today',
+      status: 'ACTIVE'
+    };
+
+    setStartupIdeas((prev) =>
+      prev.map((s) =>
+        s.id === id
+          ? {
+              ...s,
+              userJoinStatus: 'ACCEPTED',
+              teamCountCurrent: (s.teamMembers || []).some((m) => m.name === profile.name)
+                ? s.teamCountCurrent
+                : (s.teamCountCurrent || 0) + 1,
+              teamMembers: (s.teamMembers || []).some((m) => m.name === profile.name)
+                ? s.teamMembers
+                : [...(s.teamMembers || []), newMember],
+              openRoles: (s.openRoles || []).map((r) =>
+                r.roleTitle.toLowerCase() === assignedRole.toLowerCase() && r.spotsAvailable > 0
+                  ? { ...r, spotsAvailable: r.spotsAvailable - 1 }
+                  : r
+              )
+            }
+          : s
+      )
+    );
+
+    // Add to Student Profile experiences!
+    const newExp = {
+      role: assignedRole,
+      startupName: startup.ideaTitle,
+      duration: 'Active (4 Months Commitment)',
+      skillsDemonstrated: ['React', 'Python', 'Git', 'Agile Teamwork'],
+      evidenceStatus: 'STARTUP VERIFIED'
+    };
+
+    setProfile((prev) => ({
+      ...prev,
+      careerReadiness: Math.min(100, prev.careerReadiness + 8),
+      readinessBreakdown: {
+        ...prev.readinessBreakdown,
+        experience: Math.min(100, prev.readinessBreakdown.experience + 25),
+        skills: Math.min(100, prev.readinessBreakdown.skills + 5)
+      },
+      startupExperiences: [newExp, ...prev.startupExperiences]
+    }));
+
+    // Add Achievement
+    const newAch: AchievementItem = {
+      id: `ach-start-${Date.now()}`,
+      title: `Core Team Member: ${startup.ideaTitle}`,
+      category: 'STARTUP',
+      date: 'Today',
+      skillAssociated: 'React & Python',
+      evidenceConfidence: 'HIGH',
+      evidenceBadges: ['Startup Verified', 'Agile Team Collaboration', 'Real User Product'],
+      description: `Joined ${startup.ideaTitle} founded by ${startup.founderName} as ${assignedRole}.`,
+      issuer: 'SkillBridge Startup Network',
+      verified: true
+    };
+    setAchievements((prev) => [newAch, ...prev]);
+
+    // Add welcome letter in Mailbox
+    const mail: MailMessage = {
+      id: `mail-start-${Date.now()}`,
+      sender: `${startup.founderName} (${startup.ideaTitle})`,
+      senderRole: 'Startup Founder',
+      subject: `Welcome to the Team! You are officially on board as ${assignedRole}`,
+      preview: `We reviewed your verified Python & React credentials and are thrilled to welcome you to ${startup.ideaTitle}.`,
+      body: `Hi ${profile.name},\n\nI reviewed your SkillBridge profile, verified credentials in Python and practical React work.\n\nWe would love to have you on board as our ${assignedRole} for ${startup.ideaTitle}! ${intro ? `Your application notes: "${intro}" were great.` : ''}\n\nThis experience has been credited directly to your SkillBridge Passport, Portfolio, and Career Map. Let's build something impactful together!`,
+      timestamp: 'Just now',
+      category: 'STARTUP',
+      isRead: false,
+      priority: 'HIGH',
+      actionLabel: 'View Portfolio',
+      actionView: 'portfolio'
+    };
+    setMailMessages((prev) => [mail, ...prev]);
+
+    fireConfetti();
+    showToast(`Joined ${startup.ideaTitle} as ${assignedRole}! Credited to Skill Passport.`);
+    return true;
+  };
+
+  const applyToStartupRole = (startupId: string, roleTitle: string, intro: string) => {
+    const startup = startupIdeas.find((s) => s.id === startupId);
+    if (!startup) return;
+
+    const newApplicant: StartupApplicant = {
+      id: `app-${Date.now()}`,
+      startupId,
+      studentName: profile.name,
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+      roleApplied: roleTitle,
+      matchScore: 94,
+      verifiedSkills: ['React', 'Python', 'SQL', 'Git'],
+      evidenceLevel: 'PRACTICAL_VERIFIED',
+      intro: intro || 'Passionate about this domain and ready to commit 15 hours/week.',
+      status: 'PENDING',
+      appliedDate: 'Just now',
+      projectsCount: 3
+    };
+
+    setStartupIdeas((prev) =>
+      prev.map((s) =>
+        s.id === startupId
+          ? {
+              ...s,
+              userJoinStatus: 'REQUESTED',
+              applicants: [newApplicant, ...(s.applicants || [])],
+              openRoles: (s.openRoles || []).map((r) =>
+                r.roleTitle.toLowerCase() === roleTitle.toLowerCase()
+                  ? { ...r, applicantsCount: (r.applicantsCount || 0) + 1 }
+                  : r
+              )
+            }
+          : s
+      )
+    );
+
+    // Founder receives notification email
+    const mail: MailMessage = {
+      id: `mail-app-${Date.now()}`,
+      sender: 'SkillBridge Startup Desk',
+      senderRole: 'Venture System',
+      subject: `Application Received: ${roleTitle} at ${startup.ideaTitle}`,
+      preview: `Your verified SkillBridge profile was forwarded to founder ${startup.founderName}.`,
+      body: `Your application for ${roleTitle} at ${startup.ideaTitle} has been submitted with your verified Skill Passport credentials (Python: Industry Verified, React: Certificate Verified). Founder ${startup.founderName} will review your application in their Startup Management dashboard.`,
+      timestamp: 'Just now',
+      category: 'STARTUP',
+      isRead: false,
+      priority: 'NORMAL',
+      actionLabel: 'View Startups',
+      actionView: 'startups'
+    };
+    setMailMessages((prev) => [mail, ...prev]);
+
+    showToast(`Applied for ${roleTitle} at ${startup.ideaTitle} with Verified Passport!`);
+  };
+
+  const handleStartupApplicantAction = (
+    startupId: string,
+    applicantId: string,
+    action: 'ACCEPT' | 'REJECT'
+  ) => {
+    const startup = startupIdeas.find((s) => s.id === startupId);
+    if (!startup) return;
+
+    const applicant = (startup.applicants || []).find((a) => a.id === applicantId);
+
+    if (action === 'ACCEPT' && applicant) {
+      const newMember: StartupTeamMember = {
+        id: `tm-${Date.now()}`,
+        name: applicant.studentName,
+        role: applicant.roleApplied,
+        avatar: applicant.avatar,
+        verifiedSkills: applicant.verifiedSkills,
+        evidenceLevel: applicant.evidenceLevel,
+        joinedAt: 'Today',
+        status: 'ACTIVE'
+      };
+
       setStartupIdeas((prev) =>
         prev.map((s) =>
-          s.id === id
+          s.id === startupId
             ? {
                 ...s,
-                userJoinStatus: 'ACCEPTED',
-                teamCountCurrent: s.teamCountCurrent + 1
+                teamCountCurrent: (s.teamCountCurrent || 0) + 1,
+                teamMembers: [...(s.teamMembers || []), newMember],
+                applicants: (s.applicants || []).map((a) =>
+                  a.id === applicantId ? { ...a, status: 'ACCEPTED' } : a
+                )
               }
             : s
         )
       );
 
-      // Add to Student Profile experiences!
-      const newExp = {
-        role: 'React Frontend Developer',
-        startupName: startup.ideaTitle,
-        duration: 'Current (4 Months Commitment)',
-        skillsDemonstrated: ['React', 'Python', 'Git', 'Agile Teamwork'],
-        evidenceStatus: 'STARTUP VERIFIED'
-      };
+      fireConfetti();
+      showToast(`${applicant.studentName} accepted into ${startup.ideaTitle}!`);
+    } else {
+      setStartupIdeas((prev) =>
+        prev.map((s) =>
+          s.id === startupId
+            ? {
+                ...s,
+                applicants: (s.applicants || []).map((a) =>
+                  a.id === applicantId ? { ...a, status: 'REJECTED' } : a
+                )
+              }
+            : s
+        )
+      );
+      showToast('Applicant status updated.');
+    }
+  };
 
-      setProfile((prev) => ({
-        ...prev,
-        careerReadiness: Math.min(100, prev.careerReadiness + 8),
-        readinessBreakdown: {
-          ...prev.readinessBreakdown,
-          experience: Math.min(100, prev.readinessBreakdown.experience + 25),
-          skills: Math.min(100, prev.readinessBreakdown.skills + 5)
-        },
-        startupExperiences: [newExp, ...prev.startupExperiences]
-      }));
-
-      // Add Achievement
-      const newAch: AchievementItem = {
-        id: `ach-start-${Date.now()}`,
-        title: `Core Team Member: ${startup.ideaTitle}`,
-        category: 'STARTUP',
-        date: 'Today',
-        skillAssociated: 'React & Python',
-        evidenceConfidence: 'HIGH',
-        evidenceBadges: ['Startup Verified', 'Agile Team Collaboration', 'Real User Product'],
-        description: `Joined ${startup.ideaTitle} founded by ${startup.founderName} as React Frontend Engineer.`,
-        issuer: 'SkillBridge Startup Network',
-        verified: true
-      };
-      setAchievements((prev) => [newAch, ...prev]);
-
-      // Add welcome letter in Mailbox
+  const applyStartupFundingScheme = (schemeId: string) => {
+    setFundingSchemes((prev) =>
+      prev.map((sc) => (sc.id === schemeId ? { ...sc, applied: true } : sc))
+    );
+    const scheme = fundingSchemes.find((s) => s.id === schemeId);
+    if (scheme) {
       const mail: MailMessage = {
-        id: `mail-start-${Date.now()}`,
-        sender: `${startup.founderName} (${startup.ideaTitle})`,
-        senderRole: 'Startup Founder',
-        subject: `Welcome to the Team! You are officially on board as React Developer`,
-        preview: `We reviewed your verified Python & React credentials and are thrilled to welcome you to ${startup.ideaTitle}.`,
-        body: `Hi Karthik,\n\nI reviewed your SkillBridge profile, your verified credentials in Python and your practical React work.\n\nWe would love to have you on board as our React Frontend Developer for ${startup.ideaTitle}! Your task will be building the farmer-facing Telugu voice interface and crop pest advisory screen.\n\nThis experience has been credited directly to your SkillBridge Passport, Portfolio, and Career Map. Let's build something impactful together!`,
+        id: `mail-fund-${Date.now()}`,
+        sender: `${scheme.provider} (Incubation Desk)`,
+        senderRole: 'Government / Incubator Body',
+        subject: `Application Received: ${scheme.title}`,
+        preview: `Your venture application dossier has been received by the regional evaluation panel.`,
+        body: `Dear Founder,\n\nWe have received your application for "${scheme.title}".\n\nYour verified SkillBridge venture profile and student co-founder evidence badges have been forwarded to the screening committee.\n\nEvaluation timeline: 2 to 3 weeks. Shortlisted collegiate founders will be invited for an online screening viva pitch.`,
         timestamp: 'Just now',
         category: 'STARTUP',
         isRead: false,
         priority: 'HIGH',
-        actionLabel: 'View Portfolio',
-        actionView: 'portfolio'
+        actionLabel: 'Check Inbox',
+        actionView: 'mailbox'
       };
       setMailMessages((prev) => [mail, ...prev]);
-
       fireConfetti();
-      showToast(`Accepted into ${startup.ideaTitle}! Experience added to Profile & Portfolio.`);
-      return true;
+      showToast(`Application submitted to ${scheme.title}!`);
     }
-    return false;
+  };
+
+  const inviteTalentToTeam = (startupId: string, talentId: string, roleTitle: string) => {
+    const startup = startupIdeas.find((s) => s.id === startupId);
+    const talent = candidateTalents.find((t) => t.id === talentId);
+    if (!startup || !talent) return;
+
+    showToast(`Team invitation sent to ${talent.name} for ${roleTitle}!`);
+  };
+
+  const verifyStartupMilestone = (startupId: string, milestoneName: string, notes?: string) => {
+    setStartupIdeas((prev) =>
+      prev.map((s) =>
+        s.id === startupId
+          ? {
+              ...s,
+              milestoneProgress: Math.min(100, (s.milestoneProgress || 0) + 15),
+              readinessScore: Math.min(100, (s.readinessScore || 0) + 6)
+            }
+          : s
+      )
+    );
+
+    const ach: AchievementItem = {
+      id: `ach-milestone-${Date.now()}`,
+      title: `Milestone Verified: ${milestoneName}`,
+      category: 'STARTUP',
+      date: 'Today',
+      skillAssociated: 'Startup Execution',
+      evidenceConfidence: 'HIGH',
+      evidenceBadges: ['Incubator Verified', 'Milestone Defense Passed'],
+      description: `Completed milestone "${milestoneName}" with verified evidence. ${notes || ''}`,
+      issuer: 'SkillBridge Venture Sandbox',
+      verified: true
+    };
+    setAchievements((prev) => [ach, ...prev]);
+
+    fireConfetti();
+    showToast(`Milestone "${milestoneName}" verified and added to Venture Passport!`);
   };
 
   const createStartupIdea = (idea: Partial<StartupIdea>) => {
@@ -637,16 +997,46 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       id: newId,
       founderName: profile.name,
       founderRole: 'Founder / Student Innovator',
-      ideaTitle: idea.ideaTitle || 'New Innovation',
+      founderAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+      institution: profile.institution,
+      ideaTitle: idea.ideaTitle || 'New Student Innovation',
       problem: idea.problem || '',
       solution: idea.solution || '',
       category: idea.category || 'AI / ML',
-      stage: idea.stage || 'Idea',
+      stage: idea.stage || 'IDEA',
       location: idea.location || profile.location,
+      workMode: idea.workMode || 'Hybrid',
       teamCountCurrent: 1,
       teamCountTarget: idea.teamCountTarget || 4,
+      teamMembers: [
+        {
+          id: `tm-${Date.now()}`,
+          name: profile.name,
+          role: 'Founder & Vision Lead',
+          avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+          verifiedSkills: ['Product Design', 'React', 'Python'],
+          evidenceLevel: 'PRACTICAL_VERIFIED',
+          joinedAt: 'Today',
+          isFounder: true,
+          status: 'ACTIVE'
+        }
+      ],
+      openRoles: (idea.skillsNeeded && idea.skillsNeeded.length > 0
+        ? idea.skillsNeeded
+        : ['Frontend React Developer', 'Backend API Specialist']
+      ).map((skill, idx) => ({
+        id: `role-${Date.now()}-${idx}`,
+        roleTitle: `${skill} Specialist`,
+        department: 'Core Team',
+        skillsRequired: [skill],
+        spotsAvailable: 1,
+        description: `Build scalable features and collaborate on practical architecture for ${idea.ideaTitle || 'the startup'}.`,
+        matchPercent: 88,
+        applicantsCount: 0
+      })),
+      applicants: [],
       skillsNeeded: idea.skillsNeeded || ['React', 'Backend'],
-      fundingNeeded: idea.fundingNeeded || 'Grant Stage',
+      fundingNeeded: idea.fundingNeeded || '₹5,00,000 (Student Seed Grant)',
       visibility: idea.visibility || 'Public',
       likesCount: 1,
       isLiked: false,
@@ -655,11 +1045,32 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         { requiredSkill: 'React', minEvidence: 'PRACTICAL_VERIFIED' }
       ],
       userJoinStatus: 'ACCEPTED',
-      createdAt: 'Just now'
+      createdAt: 'Just now',
+      targetUsers: idea.targetUsers || 'Students and local community users',
+      businessModel: idea.businessModel || 'Freemium software with tiered service model',
+      technologyStack: idea.technologyStack || ['React', 'TypeScript', 'Tailwind', 'Node.js'],
+      resourcesNeeded: idea.resourcesNeeded || ['Incubation desk', 'Cloud credits', 'Testing devices'],
+      mentorRequirement: idea.mentorRequirement || 'Senior Technical Architect & Domain Specialist',
+      industrySupportNeeded: idea.industrySupportNeeded || 'Pilot enterprise validation partner',
+      governmentSupportNeeded: idea.governmentSupportNeeded || 'Student Innovation Fellowship Grant',
+      expectedImpact: idea.expectedImpact || 'Empower 1,000+ local users in year one',
+      readinessScore: 68,
+      readinessFactors: [
+        { factor: 'Problem Clarity', status: 'DONE', detail: idea.problem ? 'Documented user pain point.' : 'Initial draft.' },
+        { factor: 'Solution Architecture', status: 'DONE', detail: idea.solution ? 'Technical approach formulated.' : 'Draft architecture.' },
+        { factor: 'Team Completeness', status: 'WARNING', detail: 'Founder in place; seeking verified student co-builders.' },
+        { factor: 'Working Prototype', status: 'WARNING', detail: 'Repository initialized; UI & logic in progress.' },
+        { factor: 'Validation Evidence', status: 'MISSING', detail: 'User interviews scheduled for validation.' },
+        { factor: 'Funding Strategy', status: 'DONE', detail: 'Targeting student innovation grants.' }
+      ],
+      verificationStatus: 'PENDING_VERIFICATION',
+      milestoneProgress: 25,
+      studentFriendly: true
     };
 
     setStartupIdeas((prev) => [fullIdea, ...prev]);
-    showToast('Your startup idea has been published to the Innovation Feed!');
+    fireConfetti();
+    showToast('Your startup idea has been published with full Ecosystem tools!');
   };
 
   const requestMentorship = (mentorId: string) => {
@@ -714,9 +1125,305 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
   };
 
+  const markMailUnread = (id: string) => {
+    setMailMessages((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, isRead: false } : m))
+    );
+    showToast('Marked as unread.');
+  };
+
+  const toggleStarMail = (id: string) => {
+    setMailMessages((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, isStarred: !m.isStarred } : m))
+    );
+  };
+
+  const toggleImportantMail = (id: string) => {
+    setMailMessages((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, isImportant: !m.isImportant } : m))
+    );
+  };
+
+  const archiveMail = (id: string) => {
+    setMailMessages((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, folder: 'archived' } : m))
+    );
+    showToast('Message archived.');
+  };
+
+  const trashMail = (id: string) => {
+    setMailMessages((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, folder: 'trash' } : m))
+    );
+    showToast('Moved to Trash.');
+  };
+
+  const restoreMail = (id: string) => {
+    setMailMessages((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, folder: 'inbox' } : m))
+    );
+    showToast('Restored to Inbox.');
+  };
+
+  const emptyTrash = () => {
+    setMailMessages((prev) => prev.filter((m) => m.folder !== 'trash'));
+    showToast('Trash emptied.');
+  };
+
   const deleteMail = (id: string) => {
     setMailMessages((prev) => prev.filter((m) => m.id !== id));
-    showToast('Message deleted.');
+    showToast('Message deleted permanently.');
+  };
+
+  const sendMail = (newMail: {
+    recipient: string;
+    recipientRole?: string;
+    recipientHandle?: string;
+    subject: string;
+    body: string;
+    category?: MailMessage['category'];
+    priority?: 'NORMAL' | 'HIGH' | 'URGENT';
+    attachments?: { name: string; size: string; type: string }[];
+  }) => {
+    const msg: MailMessage = {
+      id: `mail-sent-${Date.now()}`,
+      folder: 'sent',
+      sender: profile.name,
+      senderRole: 'Student Candidate',
+      senderHandle: '@karthik.patel',
+      senderVerified: true,
+      recipient: newMail.recipient,
+      recipientRole: newMail.recipientRole || 'SkillBridge Contact',
+      recipientHandle: newMail.recipientHandle || '@contact.user',
+      subject: newMail.subject,
+      preview: newMail.body.slice(0, 80) + '...',
+      body: newMail.body,
+      timestamp: 'Just now',
+      category: newMail.category || 'SYSTEM',
+      isRead: true,
+      priority: newMail.priority || 'NORMAL',
+      attachments: newMail.attachments || []
+    };
+
+    setMailMessages((prev) => [msg, ...prev]);
+    showToast(`Message sent to ${newMail.recipient} via SkillBridge Mailbox!`);
+  };
+
+  const replyMail = (mailId: string, replyBody: string) => {
+    setMailMessages((prev) =>
+      prev.map((m) => {
+        if (m.id === mailId) {
+          const newReply = {
+            id: `reply-${Date.now()}`,
+            sender: profile.name,
+            senderRole: 'Student Candidate',
+            senderHandle: '@karthik.patel',
+            body: replyBody,
+            timestamp: 'Just now'
+          };
+          return {
+            ...m,
+            isRead: true,
+            replies: [...(m.replies || []), newReply]
+          };
+        }
+        return m;
+      })
+    );
+    showToast('Reply sent successfully.');
+  };
+
+  const forwardMail = (mailId: string, toRecipient: string, forwardNote: string = '') => {
+    const original = mailMessages.find((m) => m.id === mailId);
+    if (!original) return;
+
+    const fwdMsg: MailMessage = {
+      id: `mail-fwd-${Date.now()}`,
+      folder: 'sent',
+      sender: profile.name,
+      senderRole: 'Student Candidate',
+      senderHandle: '@karthik.patel',
+      recipient: toRecipient,
+      subject: `Fwd: ${original.subject}`,
+      preview: (forwardNote || original.preview).slice(0, 80),
+      body: `${forwardNote ? forwardNote + '\n\n---------- Forwarded message ---------\n' : ''}${original.body}`,
+      timestamp: 'Just now',
+      category: original.category,
+      isRead: true,
+      priority: original.priority,
+      attachments: original.attachments
+    };
+
+    setMailMessages((prev) => [fwdMsg, ...prev]);
+    showToast(`Forwarded to ${toRecipient}.`);
+  };
+
+  // Contact System Actions
+  const requestContact = (contactId: string, message?: string) => {
+    setContacts((prev) =>
+      prev.map((c) => (c.id === contactId ? { ...c, status: 'PENDING' } : c))
+    );
+    const target = contacts.find((c) => c.id === contactId);
+    if (target) {
+      // Send an automated introductory message into mailbox
+      const reqMail: MailMessage = {
+        id: `mail-req-${Date.now()}`,
+        folder: 'sent',
+        sender: profile.name,
+        senderRole: 'Student Candidate',
+        senderHandle: '@karthik.patel',
+        recipient: target.name,
+        recipientRole: target.role,
+        recipientHandle: target.handle,
+        subject: `Connection Request: ${profile.name} (${profile.targetCareer})`,
+        preview: message || `Hi ${target.name}, I would like to connect through SkillBridge.`,
+        body: message || `Dear ${target.name},\n\nI came across your profile in the SkillBridge People & Mentor directory. As an aspiring ${profile.targetCareer} with verified skills in Python and React, I would value the opportunity to connect.\n\nThank you,\n${profile.name}`,
+        timestamp: 'Just now',
+        category: 'MENTORSHIP',
+        isRead: true,
+        priority: 'NORMAL'
+      };
+      setMailMessages((prev) => [reqMail, ...prev]);
+      showToast(`Connection request sent to ${target.name} via internal handle ${target.handle}!`);
+    }
+  };
+
+  const updateContactStatus = (contactId: string, status: 'ACCEPTED' | 'DECLINED' | 'BLOCKED') => {
+    setContacts((prev) =>
+      prev.map((c) => (c.id === contactId ? { ...c, status } : c))
+    );
+    showToast(`Contact status updated to ${status}.`);
+  };
+
+  // Local Jobs Actions
+  const applyLocalJob = (jobId: string, pitch?: string) => {
+    setLocalJobs((prev) =>
+      prev.map((j) => (j.id === jobId ? { ...j, applicationState: 'Applied' } : j))
+    );
+    const job = localJobs.find((j) => j.id === jobId);
+    if (job) {
+      fireConfetti();
+      // Generate immediate employer confirmation in Mailbox inbox
+      const confMail: MailMessage = {
+        id: `mail-job-${Date.now()}`,
+        folder: 'inbox',
+        sender: job.employer,
+        senderRole: 'Hiring Coordinator',
+        senderHandle: job.employerHandle || '@employer.desk',
+        senderVerified: job.verificationStatus === 'Employer Verified',
+        recipient: profile.name,
+        recipientHandle: '@karthik.patel',
+        subject: `Application Received: ${job.title}`,
+        preview: `Thank you for applying to ${job.employer}. Your SkillBridge passport is under review.`,
+        body: `Dear ${profile.name},\n\nWe have received your application for the ${job.title} role (${job.workingHours}, ${job.salaryRate}).\n\nYour SkillBridge verified match score is ${job.matchScore}%. Our hiring supervisor will inspect your verified test defense and contact you for schedule confirmation.\n\n${pitch ? `Your Submitted Note:\n"${pitch}"\n\n` : ''}Best regards,\n${job.employer} Team`,
+        timestamp: 'Just now',
+        category: 'LOCAL_JOB',
+        isRead: false,
+        isStarred: true,
+        isImportant: true,
+        priority: 'HIGH',
+        actionLabel: 'View Application',
+        actionView: 'local-jobs'
+      };
+      setMailMessages((prev) => [confMail, ...prev]);
+      showToast(`Applied for "${job.title}"! Confirmation sent to your Mailbox.`);
+    }
+  };
+
+  const toggleSaveLocalJob = (jobId: string) => {
+    setLocalJobs((prev) =>
+      prev.map((j) => (j.id === jobId ? { ...j, isSaved: !j.isSaved } : j))
+    );
+  };
+
+  const withdrawLocalJob = (jobId: string) => {
+    setLocalJobs((prev) =>
+      prev.map((j) => (j.id === jobId ? { ...j, applicationState: 'Withdrawn' } : j))
+    );
+    showToast('Application withdrawn.');
+  };
+
+  // Podcasts & Meetups Actions
+  const registerMeetup = (meetupId: string) => {
+    const meetup = offlineMeetups.find((m) => m.id === meetupId);
+    if (!meetup) return;
+
+    if (meetup.registered) {
+      setOfflineMeetups((prev) =>
+        prev.map((m) =>
+          m.id === meetupId
+            ? { ...m, registered: false, seatsRemaining: m.seatsRemaining + 1 }
+            : m
+        )
+      );
+      showToast(`Cancelled registration for "${meetup.title}".`);
+    } else {
+      if (meetup.seatsRemaining <= 0) {
+        showToast('Sorry, this meetup is completely booked.');
+        return;
+      }
+      setOfflineMeetups((prev) =>
+        prev.map((m) =>
+          m.id === meetupId
+            ? { ...m, registered: true, seatsRemaining: Math.max(0, m.seatsRemaining - 1) }
+            : m
+        )
+      );
+      fireConfetti();
+      // Generate Entry Pass ticket email in Mailbox
+      const passMail: MailMessage = {
+        id: `mail-meetup-${Date.now()}`,
+        folder: 'inbox',
+        sender: meetup.organizer,
+        senderRole: 'Event Registration Desk',
+        senderHandle: '@meetup.desk',
+        senderVerified: true,
+        recipient: profile.name,
+        recipientHandle: '@karthik.patel',
+        subject: `Your Entry Pass: ${meetup.title}`,
+        preview: `Confirmed! Present this pass at ${meetup.venue} on ${meetup.date}.`,
+        body: `Hello ${profile.name},\n\nYour seat has been officially confirmed for:\nEvent: ${meetup.title}\nGuest: ${meetup.guest}\nDate & Time: ${meetup.date} (${meetup.time})\nVenue: ${meetup.venue}, ${meetup.city}\nPass ID: SB-MEET-${Date.now().toString().slice(-6)}\n\nPlease bring your college student ID. Arrive 15 minutes before scheduled start time.`,
+        timestamp: 'Just now',
+        category: 'PODCAST',
+        isRead: false,
+        isStarred: true,
+        isImportant: true,
+        priority: 'HIGH',
+        attachments: [
+          { name: `Entry_Pass_${meetup.id}.pdf`, size: '142 KB', type: 'application/pdf' }
+        ]
+      };
+      setMailMessages((prev) => [passMail, ...prev]);
+      showToast(`Seat Confirmed for "${meetup.title}"! Entry pass delivered to Mailbox.`);
+    }
+  };
+
+  const registerLiveSession = (sessionId: string) => {
+    setLiveSessions((prev) =>
+      prev.map((s) => (s.id === sessionId ? { ...s, registered: !s.registered } : s))
+    );
+    showToast('Registration preference updated for live interaction session.');
+  };
+
+  const submitLiveQuestion = (sessionId: string, question: string) => {
+    setLiveSessions((prev) =>
+      prev.map((s) => {
+        if (s.id === sessionId) {
+          const newQ = {
+            id: `q-${Date.now()}`,
+            studentName: profile.name,
+            question,
+            votes: 1
+          };
+          return {
+            ...s,
+            questionsSubmitted: [newQ, ...s.questionsSubmitted]
+          };
+        }
+        return s;
+      })
+    );
+    showToast('Your question has been submitted for speaker review!');
   };
 
   const markNotificationAsRead = (id: string) => {
@@ -748,6 +1455,261 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }));
   };
 
+  const submitFeeReport = (report: Omit<FeeReportItem, 'id' | 'status' | 'createdAt'>) => {
+    const newReport: FeeReportItem = {
+      ...report,
+      id: `fee-rep-${Date.now()}`,
+      status: 'REPORT_SUBMITTED',
+      statusNotes: 'Report received and registered in transparency ledger. Preliminary document validation in progress.',
+      createdAt: new Date().toISOString().split('T')[0]
+    };
+    setFeeReports((prev) => [newReport, ...prev]);
+    showToast('Fee discrepancy report filed. Status: REPORT SUBMITTED for objective review.');
+  };
+
+  const addStudentProject = (project: Omit<StudentProjectItem, 'id'>) => {
+    const newProj: StudentProjectItem = {
+      ...project,
+      id: `proj-${Date.now()}`
+    };
+    setStudentProjects((prev) => [newProj, ...prev]);
+    showToast(`Project "${newProj.title}" added to your verified portfolio!`);
+  };
+
+  const addFastRequirement = (req: Omit<FastRecruitmentRequirement, 'id'>) => {
+    const newReq: FastRecruitmentRequirement = {
+      ...req,
+      id: `fast-req-${Date.now()}`
+    };
+    setFastRequirements((prev) => [newReq, ...prev]);
+    showToast(`Fast recruitment role "${newReq.roleTitle}" published!`);
+  };
+
+  const toggleCandidateShortlist = (reqId: string, candidateId: string) => {
+    setCandidateComparisons((prev) => {
+      const list = prev[reqId] || [];
+      return {
+        ...prev,
+        [reqId]: list.map((c) =>
+          c.id === candidateId ? { ...c, shortlisted: !c.shortlisted } : c
+        )
+      };
+    });
+    showToast('Candidate shortlist status updated.');
+  };
+
+  const hireCandidate = (reqId: string, candidateId: string) => {
+    setCandidateComparisons((prev) => {
+      const list = prev[reqId] || [];
+      return {
+        ...prev,
+        [reqId]: list.map((c) =>
+          c.id === candidateId ? { ...c, hired: true, shortlisted: true } : c
+        )
+      };
+    });
+    showToast('Candidate Fast Hired! Direct interview offer dispatched.');
+  };
+
+  const sendChatMessage = (conversationId: string, text: string, attachment?: ChatMessageAttachment) => {
+    if (!text.trim() && !attachment) return;
+    const newMsg: ChatMessage = {
+      id: `msg-${Date.now()}`,
+      senderId: 'karthik-peetla',
+      senderName: profile.name,
+      senderRole: 'Student (You)',
+      isMe: true,
+      text: text.trim(),
+      timestamp: 'Just now',
+      attachment,
+      isRead: true
+    };
+    setChatConversations(prev => prev.map(c => {
+      if (c.id === conversationId) {
+        return {
+          ...c,
+          lastMessage: text.trim() || (attachment ? attachment.title : 'Attachment shared'),
+          lastMessageTime: 'Just now',
+          messages: [...c.messages, newMsg]
+        };
+      }
+      return c;
+    }));
+  };
+
+  const markConversationAsRead = (conversationId: string) => {
+    setChatConversations(prev => prev.map(c => {
+      if (c.id === conversationId) {
+        return {
+          ...c,
+          unreadCount: 0,
+          messages: c.messages.map(m => ({ ...m, isRead: true }))
+        };
+      }
+      return c;
+    }));
+  };
+
+  const openChatWithUser = (user: { id: string; name: string; role: string; org?: string; avatar?: string; type?: ConversationType }) => {
+    const existing = chatConversations.find(c => c.participantId === user.id);
+    if (!existing) {
+      const newConv: ChatConversation = {
+        id: `conv-${user.id}-${Date.now()}`,
+        type: user.type || 'STUDENT_STUDENT',
+        participantId: user.id,
+        participantName: user.name,
+        participantRole: user.role,
+        participantOrg: user.org || 'SkillBridge Network',
+        participantAvatar: user.avatar,
+        onlineStatus: 'ONLINE',
+        unreadCount: 0,
+        lastMessage: 'Conversation started',
+        lastMessageTime: 'Just now',
+        messages: [
+          {
+            id: `msg-${Date.now()}`,
+            senderId: user.id,
+            senderName: user.name,
+            senderRole: user.role,
+            isMe: false,
+            text: `Hi Karthik! Thanks for connecting on SkillBridge. How can we collaborate?`,
+            timestamp: 'Just now',
+            isRead: true
+          }
+        ]
+      };
+      setChatConversations(prev => [newConv, ...prev]);
+      setActiveConversationId(newConv.id);
+    } else {
+      setActiveConversationId(existing.id);
+    }
+    setActiveTab('messages');
+  };
+
+  const inviteToProjectInChat = (conversationId: string, projectTitle: string, note?: string) => {
+    sendChatMessage(conversationId, note || `I would like to invite you to collaborate on ${projectTitle}!`, {
+      type: 'PROJECT_INVITE',
+      title: projectTitle,
+      subtitle: 'Click to view project details in Project Hub',
+      linkTab: 'projects'
+    });
+    showToast(`Project invitation sent to chat!`);
+  };
+
+  const shareOpportunityInChat = (conversationId: string, opportunityTitle: string, subtitle?: string) => {
+    sendChatMessage(conversationId, `Check out this verified opportunity: ${opportunityTitle}`, {
+      type: 'OPPORTUNITY_SHARE',
+      title: opportunityTitle,
+      subtitle: subtitle || 'Verified by SkillBridge',
+      linkTab: 'opportunities'
+    });
+    showToast(`Opportunity shared to conversation!`);
+  };
+
+  const applyToIndustryOpportunity = (oppId: string) => {
+    setIndustryHiringOpportunities(prev => prev.map(opp => {
+      if (opp.id === oppId) {
+        return { ...opp, applied: true };
+      }
+      return opp;
+    }));
+    showToast(`Application submitted! Recruiter will review your verified Skill Passport.`);
+  };
+
+  const toggleSaveIndustryOpportunity = (oppId: string) => {
+    setIndustryHiringOpportunities(prev => prev.map(opp => {
+      if (opp.id === oppId) {
+        return { ...opp, saved: !opp.saved };
+      }
+      return opp;
+    }));
+  };
+
+  const applyToFacultyOpportunity = (oppId: string) => {
+    setFacultyOpportunities(prev => prev.map(opp => {
+      if (opp.id === oppId) {
+        return { ...opp, applied: true };
+      }
+      return opp;
+    }));
+    showToast(`Faculty nomination submitted! Academic relations liaison will contact your institution.`);
+  };
+
+  const toggleStudentConnection = (studentId: string) => {
+    setStudentDirectory(prev => prev.map(st => {
+      if (st.id === studentId) {
+        const current = st.connectionStatus || (st.isConnected ? 'CONNECTED' : 'NOT_CONNECTED');
+        let next: 'NOT_CONNECTED' | 'REQUEST_SENT' | 'CONNECTED' = 'REQUEST_SENT';
+        if (current === 'NOT_CONNECTED') next = 'REQUEST_SENT';
+        else if (current === 'REQUEST_SENT') next = 'CONNECTED';
+        else next = 'NOT_CONNECTED';
+        
+        showToast(
+          next === 'REQUEST_SENT'
+            ? `Connection request sent to ${st.name}`
+            : next === 'CONNECTED'
+            ? `Connected with ${st.name}! You can now message them.`
+            : `Disconnected from ${st.name}`
+        );
+        return {
+          ...st,
+          isConnected: next === 'CONNECTED',
+          connectionStatus: next
+        };
+      }
+      return st;
+    }));
+  };
+
+  const inviteStudentToProject = (studentId: string, projectId: string, note: string) => {
+    const student = studentDirectory.find(s => s.id === studentId);
+    const project = hubProjects.find(p => p.id === projectId);
+    if (!student || !project) return;
+    openChatWithUser({
+      id: student.id,
+      name: student.name,
+      role: student.course || student.targetCareer,
+      org: student.college,
+      avatar: student.avatar,
+      type: 'STUDENT_STUDENT'
+    });
+    setTimeout(() => {
+      inviteToProjectInChat(
+        chatConversations.find(c => c.participantId === student.id)?.id || chatConversations[0]?.id,
+        project.title,
+        note
+      );
+    }, 100);
+    showToast(`Invited ${student.name} to ${project.title}`);
+  };
+
+  const inviteStudentToStartup = (studentId: string, startupId: string, roleTitle: string, note: string) => {
+    const student = studentDirectory.find(s => s.id === studentId);
+    const startup = startupIdeas.find(s => s.id === startupId);
+    if (!student || !startup) return;
+    openChatWithUser({
+      id: student.id,
+      name: student.name,
+      role: student.course || student.targetCareer,
+      org: student.college,
+      avatar: student.avatar,
+      type: 'STUDENT_STUDENT'
+    });
+    setTimeout(() => {
+      sendChatMessage(
+        chatConversations.find(c => c.participantId === student.id)?.id || chatConversations[0]?.id,
+        note || `We would like to invite you to join ${startup.title} as ${roleTitle}!`,
+        {
+          type: 'PROJECT_INVITE',
+          title: `${startup.title} — ${roleTitle}`,
+          subtitle: 'Startup Co-founder / Core Team Invite',
+          linkTab: 'startups'
+        }
+      );
+    }, 100);
+    showToast(`Sent startup invitation to ${student.name}`);
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -766,12 +1728,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         trainForJobRoute,
         scholarships,
         institutions,
+        feeReports,
+        submitFeeReport,
+        studentProjects,
+        addStudentProject,
+        fastRequirements,
+        addFastRequirement,
+        candidateComparisons,
+        toggleCandidateShortlist,
+        hireCandidate,
+        hubProjects,
+        setHubProjects,
         startupIdeas,
+        fundingSchemes,
+        candidateTalents,
         mentors,
         achievements,
         mailMessages,
         notifications,
         techTrends,
+        contacts,
+        localJobs,
+        podcasts,
+        offlineMeetups,
+        liveSessions,
         isSearchOpen,
         setIsSearchOpen,
         isAskAIOpen,
@@ -800,14 +1780,63 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         toggleLikeStartup,
         toggleSupportStartup,
         joinStartupTeam,
+        applyToStartupRole,
+        handleStartupApplicantAction,
+        applyStartupFundingScheme,
+        inviteTalentToTeam,
+        verifyStartupMilestone,
         createStartupIdea,
         requestMentorship,
         addTrendToCareerMap,
         addTechTrendToCareerMap: addTrendToCareerMap,
         markMailAsRead,
+        markMailUnread,
+        toggleStarMail,
+        toggleImportantMail,
+        archiveMail,
+        trashMail,
+        restoreMail,
+        emptyTrash,
         deleteMail,
+        sendMail,
+        replyMail,
+        forwardMail,
+        requestContact,
+        updateContactStatus,
+        applyLocalJob,
+        toggleSaveLocalJob,
+        withdrawLocalJob,
+        registerMeetup,
+        registerLiveSession,
+        submitLiveQuestion,
         markNotificationAsRead,
-        revalidateSkill
+        revalidateSkill,
+
+        // Messages & Real-Time Chat
+        chatConversations,
+        activeConversationId,
+        setActiveConversationId,
+        sendChatMessage,
+        openChatWithUser,
+        inviteToProjectInChat,
+        shareOpportunityInChat,
+        markConversationAsRead,
+        unreadChatCount,
+
+        // Industry Hiring
+        industryHiringOpportunities,
+        applyToIndustryOpportunity,
+        toggleSaveIndustryOpportunity,
+
+        // Faculty & Academia Opportunities
+        facultyOpportunities,
+        applyToFacultyOpportunity,
+
+        // Student Directory & Connections
+        studentDirectory,
+        toggleStudentConnection,
+        inviteStudentToProject,
+        inviteStudentToStartup
       }}
     >
       {children}

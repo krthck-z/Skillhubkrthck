@@ -77,6 +77,114 @@ export const OpportunitiesView: React.FC = () => {
         </button>
       </div>
 
+      {/* Fast Match For Students Section */}
+      <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-6 text-white shadow-lg space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-amber-400" />
+                Fast Match Engine
+              </span>
+              <span className="text-xs font-bold text-slate-300">
+                Direct Recruiter Matching
+              </span>
+            </div>
+            <h2 className="text-lg font-extrabold text-white mt-1">
+              Quick Hire & Shortest Path Opportunities
+            </h2>
+          </div>
+          <span className="text-xs text-slate-400">
+            Based on your verified skills & project evidence
+          </span>
+        </div>
+
+        <div className="grid lg:grid-cols-12 gap-5">
+          {/* Quick Hire Block */}
+          <div className="lg:col-span-7 bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/15 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-emerald-300 flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                Quick Hire: 100% Skill Evidence Match
+              </span>
+              <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-extrabold">
+                Immediate Joining
+              </span>
+            </div>
+
+            <div className="p-3.5 rounded-lg bg-white/5 border border-white/10 space-y-2">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-bold text-white">Junior Frontend Developer (HTML/CSS/JS + Git)</h3>
+                  <p className="text-xs text-slate-300">
+                    Rayalaseema Digital Media • Anantapur / Hybrid • ₹18,000 / month
+                  </p>
+                </div>
+                <span className="text-xs font-black text-emerald-400 bg-emerald-950/80 px-2 py-1 rounded border border-emerald-500/30 shrink-0">
+                  4/4 Skills Met
+                </span>
+              </div>
+
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Company does not demand full-stack depth. They need clean semantic markup, responsive CSS, DOM manipulation, and clean Git commits. Your verified passport satisfies all 4 mandates.
+              </p>
+
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/10">
+                <div className="flex items-center gap-1.5 text-[11px] text-slate-300">
+                  <span className="px-2 py-0.5 rounded bg-white/10 text-emerald-300 font-semibold">HTML5 ✓</span>
+                  <span className="px-2 py-0.5 rounded bg-white/10 text-emerald-300 font-semibold">CSS3 ✓</span>
+                  <span className="px-2 py-0.5 rounded bg-white/10 text-emerald-300 font-semibold">JavaScript ES6 ✓</span>
+                  <span className="px-2 py-0.5 rounded bg-white/10 text-emerald-300 font-semibold">Git ✓</span>
+                </div>
+
+                <button
+                  onClick={() => {
+                    const opp = opportunities.find((o) => o.id === 'opp-1') || opportunities[0];
+                    if (opp) applyToOpportunity(opp.id);
+                  }}
+                  className="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs rounded-lg transition-colors cursor-pointer flex items-center gap-1 shadow-xs"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>1-Click Direct Apply (100% Match)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Shortest Path Block */}
+          <div className="lg:col-span-5 bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/15 space-y-3 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-amber-400" />
+                  Shortest Path to Hiring
+                </span>
+                <span className="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full font-bold">
+                  High Leverage
+                </span>
+              </div>
+
+              <div className="mt-2.5 p-3 rounded-lg bg-white/5 border border-white/10 space-y-2">
+                <div className="flex items-baseline justify-between">
+                  <span className="text-xs font-bold text-white">Target: React Hooks & State</span>
+                  <span className="text-xs text-amber-300 font-bold">Close 15% Gap</span>
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Completing 1 practical React challenge qualifies you for <strong>3 immediate partner openings</strong> (NovaSoft, CloudScale, AgriSmart) paying up to ₹25,000/month.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setIsTrainJobModalOpen(true)}
+              className="w-full py-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+            >
+              <span>Take Micro-Assessment for 3 Roles →</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Philosophy Banner: Where Am I Eligible? (Section 15 & 16) */}
       <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 text-xs flex items-center justify-between gap-4">
         <div className="flex items-center gap-2.5">

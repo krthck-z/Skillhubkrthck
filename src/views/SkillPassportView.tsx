@@ -185,14 +185,14 @@ export const SkillPassportView: React.FC = () => {
       </div>
 
       {/* Startup & Project Experience Section */}
-      {profile.startupExperiences.length > 0 && (
+      {(profile.startupExperiences || []).length > 0 && (
         <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-2xs space-y-3">
           <div className="flex items-center gap-2">
             <Award className="w-5 h-5 text-purple-600" />
             <h3 className="font-bold text-base text-slate-900">Verified Startup Experience</h3>
           </div>
           <div className="grid sm:grid-cols-2 gap-3 pt-1">
-            {profile.startupExperiences.map((exp, i) => (
+            {(profile.startupExperiences || []).map((exp, i) => (
               <div key={i} className="p-4 rounded-xl bg-purple-50/50 border border-purple-200 space-y-1.5 text-xs">
                 <div className="flex items-center justify-between">
                   <span className="font-extrabold text-purple-950 text-sm">{exp.role}</span>
@@ -202,7 +202,7 @@ export const SkillPassportView: React.FC = () => {
                 </div>
                 <p className="font-semibold text-purple-900">{exp.startupName} • {exp.duration}</p>
                 <div className="flex flex-wrap gap-1 pt-1">
-                  {exp.skillsDemonstrated.map((sk, idx) => (
+                  {(exp.skillsDemonstrated || []).map((sk, idx) => (
                     <span key={idx} className="px-2 py-0.5 rounded bg-white text-purple-800 text-[10px] font-mono border border-purple-200">
                       {sk}
                     </span>
