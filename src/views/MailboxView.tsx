@@ -27,7 +27,9 @@ import {
   Sparkles,
   X,
   FileCheck,
-  CornerDownRight
+  CornerDownRight,
+  Building2,
+  GraduationCap
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { MailMessage } from '../types';
@@ -36,6 +38,7 @@ type MailFolder = 'inbox' | 'sent' | 'drafts' | 'starred' | 'important' | 'archi
 
 export const MailboxView: React.FC = () => {
   const {
+    role,
     mailMessages,
     markMailAsRead,
     markMailUnread,
@@ -238,6 +241,24 @@ export const MailboxView: React.FC = () => {
 
         {/* Top Actions */}
         <div className="flex items-center gap-2">
+          {role === 'industry' && (
+            <button
+              onClick={() => setActiveTab('industry')}
+              className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+            >
+              <Building2 className="w-3.5 h-3.5 text-amber-400" />
+              <span>← Back to Industry Portal</span>
+            </button>
+          )}
+          {role === 'institute' && (
+            <button
+              onClick={() => setActiveTab('academia')}
+              className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+            >
+              <GraduationCap className="w-3.5 h-3.5 text-emerald-200" />
+              <span>← Back to Academia Portal</span>
+            </button>
+          )}
           <button
             id="refresh-mailbox-btn"
             onClick={() => showToast('Mailbox synced with SkillBridge network.')}
@@ -943,7 +964,7 @@ export const MailboxView: React.FC = () => {
                 {/* Quick Recipient Chips */}
                 <div className="flex items-center gap-1.5 mt-2 overflow-x-auto no-scrollbar">
                   <span className="text-[10px] text-slate-400 font-medium shrink-0">Quick Select:</span>
-                  {contacts.slice(0, 4).map((c) => (
+                  {(contacts || []).slice(0, 4).map((c) => (
                     <button
                       key={c.id}
                       type="button"

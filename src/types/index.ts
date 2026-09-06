@@ -63,7 +63,7 @@ export interface LearningResource {
   category?: string;
   level: 'Beginner' | 'Intermediate' | 'Advanced';
   mode: 'Online' | 'Offline' | 'Hybrid';
-  type: 'FREE_ONLINE' | 'PAID_ONLINE' | 'GOVERNMENT' | 'PRIVATE' | 'OFFLINE_CENTRE' | 'PRACTICAL_TRAINING' | 'YOUTUBE';
+  type: 'FREE_ONLINE' | 'PAID_ONLINE' | 'GOVERNMENT' | 'PRIVATE' | 'OFFLINE_CENTRE' | 'PRACTICAL_TRAINING' | 'YOUTUBE' | 'FREE';
   provider: string;
   isGovernment: boolean;
   duration: string;
@@ -130,9 +130,11 @@ export interface OpportunityItem {
   companyName: string;
   companyLogo?: string;
   industry: string;
+  category?: string;
+  isDemo?: boolean;
   location: string;
   workMode: 'Remote' | 'On-Site' | 'Hybrid';
-  type: 'INTERNSHIP' | 'FULL_TIME' | 'PART_TIME';
+  type: 'INTERNSHIP' | 'FULL_TIME' | 'PART_TIME' | 'APPRENTICESHIP' | 'FREELANCE' | 'FELLOWSHIP' | 'HACKATHON';
   duration?: string;
   stipendOrSalary: string;
   deadline: string;
@@ -528,6 +530,9 @@ export interface AchievementItem {
   description: string;
   issuer: string;
   verified: boolean;
+  unlocked?: boolean;
+  unlockedAt?: string;
+  badgeIcon?: string;
 }
 
 export interface MailAttachment {
@@ -709,6 +714,17 @@ export interface StudentProfile {
   location: string;
   targetCareer: string;
   careerReadiness: number;
+  enrollmentNumber?: string;
+  email?: string;
+  phone?: string;
+  bio?: string;
+  cgpa?: string;
+  batch?: string;
+  avatarUrl?: string;
+  speciality?: string;
+  interests?: string[];
+  availability?: string;
+  preferredLocations?: string[];
   readinessBreakdown: {
     skills: number;
     assessment: number;
@@ -767,7 +783,11 @@ export interface StudentDirectoryItem {
   college: string;
   location: string;
   targetCareer: string;
+  careerGoal?: string;
   careerReadiness: number;
+  readinessScore?: number;
+  projectTitle?: string;
+  evidenceLevel?: EvidenceLevel;
   verifiedSkills: string[];
   unverifiedSkills: string[];
   assessmentPassedCount: number;
@@ -1036,4 +1056,165 @@ export interface ProjectHubItem {
   userRole?: string;
   syncedToProfile?: boolean;
   createdAt: string;
+}
+
+// =============================================================================
+// FACULTY INTELLIGENCE, VERIFICATION & PERFORMANCE TYPES
+// =============================================================================
+export type FacultySkillLevel = 'STRONG' | 'DEVELOPING' | 'NEEDS_IMPROVEMENT';
+
+export interface FacultySkillVisualization {
+  skillName: string;
+  proficiencyScore: number; // 0 to 100
+  level: FacultySkillLevel;
+  lastVerifiedDate?: string;
+  evidenceSource?: string;
+  isCurriculumRequired?: boolean;
+  isIndustryDemand?: boolean;
+}
+
+export interface FacultyOfflineTestRecord {
+  id: string;
+  skillName: string;
+  testDate: string;
+  evaluatorName: string;
+  evaluatorOrg: string;
+  testType: 'LAB_PRACTICAL' | 'TEACHING_DEMO' | 'ORAL_VIVA' | 'CODE_DEFENSE';
+  scorePercent: number;
+  verdict: 'PASS' | 'FAIL' | 'RETEST_RECOMMENDED';
+  feedbackNotes: string;
+  verifiedBadgeUrl?: string;
+}
+
+export interface FacultySubjectMetric {
+  subjectCode: string;
+  subjectName: string;
+  semester: string;
+  studentsEnrolled: number;
+  studentsPassed: number;
+  studentsFailed: number;
+  passPercentage: number;
+  trend: 'IMPROVING' | 'STABLE' | 'DECLINING';
+  averageScore: number;
+}
+
+export interface FacultyComplaintRecord {
+  id: string;
+  category: 'ACADEMIC_PERFORMANCE' | 'ATTENDANCE_CONCERN' | 'STUDENT_FEEDBACK' | 'CURRICULUM_DELIVERY' | 'PROFESSIONAL_CONDUCT';
+  filedByRole: 'STUDENT_REP' | 'HOD' | 'DEAN' | 'PARENT_COUNCIL';
+  dateReported: string;
+  summary: string;
+  evidenceNotes: string;
+  status: 'NORMAL' | 'UNDER_REVIEW' | 'IMPROVEMENT_REQUIRED' | 'RESTRICTED' | 'SUSPENDED';
+  resolutionDecision?: string;
+}
+
+export interface FacultyMemberItem {
+  id: string;
+  name: string;
+  facultyId: string;
+  collegeName: string;
+  department: string;
+  designation: string;
+  qualification: string;
+  experienceYears: number;
+  subjectsTaught: string[];
+  skills: FacultySkillVisualization[];
+  recommendedSkillsToDevelop: string[];
+  certifications: string[];
+  completedCoursesCount: number;
+  pendingCoursesCount: number;
+  industryTrainingCompleted: string[];
+  facultyInternshipsCompleted: string[];
+  fdpParticipationCount: number;
+  attendancePercentage: number;
+  overallPerformanceRating: number; // e.g. 4.6 / 5.0
+  performanceStatus: 'EXCELLING' | 'SATISFACTORY' | 'UNDER_REVIEW' | 'REQUIRES_DEVELOPMENT';
+  offlineVerificationStatus: 'PRACTICALLY_VERIFIED' | 'PENDING_OFFLINE_TEST' | 'RETEST_SCHEDULED';
+  offlineTestRecords: FacultyOfflineTestRecord[];
+  subjectMetrics: FacultySubjectMetric[];
+  complaints: FacultyComplaintRecord[];
+  avatarUrl?: string;
+}
+
+export interface FacultyTrainingEnrollment {
+  id: string;
+  facultyId: string;
+  facultyName: string;
+  collegeName: string;
+  department: string;
+  subject: string;
+  currentSkills: string[];
+  targetSkill: string;
+  skillLevel: 'BASIC' | 'INTERMEDIATE' | 'ADVANCED';
+  trainingProgramName: string;
+  trainerName: string;
+  trainerCompany: string;
+  batch: string;
+  classTiming: string;
+  classLocation: string;
+  mode: 'ONLINE' | 'OFFLINE';
+  startDate: string;
+  endDate: string;
+  attendancePercent: number;
+  courseProgressPercent: number;
+  assessmentStatus: 'NOT_STARTED' | 'IN_PROGRESS' | 'PASSED' | 'REQUIRES_RETEST';
+  certificationStatus: 'PENDING_OFFLINE_TEST' | 'PRACTICALLY_VERIFIED' | 'CERTIFIED';
+}
+
+export interface FacultyClassScheduleItem {
+  id: string;
+  date: string;
+  time: string;
+  facultyName: string;
+  collegeName: string;
+  courseName: string;
+  trainerName: string;
+  trainerCompany: string;
+  location: string;
+  mode: 'ONLINE' | 'OFFLINE';
+  status: 'UPCOMING' | 'IN_SESSION' | 'COMPLETED';
+}
+
+// =============================================================================
+// STUDENT INTERVENTION & PERFORMANCE EXTENSION
+// =============================================================================
+export type StudentRiskBand = 'HIGH_PERFORMING' | 'DEVELOPING' | 'AT_RISK' | 'NEEDS_INTERVENTION';
+
+export interface StudentInterventionRecord {
+  id: string;
+  studentId: string;
+  studentName: string;
+  riskBand: StudentRiskBand;
+  flagReason: string;
+  interventionType: 'ACADEMIC_COUNSELLING' | 'COURSE_REMEDIATION' | 'MENTOR_ASSIGNMENT' | 'LAB_VIVA_COACHING';
+  assignedFacultyName: string;
+  dateCreated: string;
+  status: 'IDENTIFIED' | 'UNDER_SUPPORT' | 'MONITORING' | 'RESOLVED';
+  actionNotes: string;
+}
+
+// =============================================================================
+// SYLLABUS GAP EXTENSION
+// =============================================================================
+export interface SyllabusGapItem {
+  id: string;
+  subjectOrDomain: string;
+  coveredInCurrentSyllabus: string[];
+  partiallyCovered: string[];
+  missingSkills: string[];
+  outdatedTechnologies: string[];
+  missingPracticalExposure: string[];
+  missingProjects: string[];
+  missingIndustryTraining: string[];
+  recommendation: {
+    suggestedModule: string;
+    duration: string;
+    skillLevel: 'Basic' | 'Intermediate' | 'Advanced';
+    practicalComponent: string;
+    capstoneProject: string;
+    assessmentType: string;
+    industryTrainerPartner: string;
+    certificationOutcome: string;
+  };
 }

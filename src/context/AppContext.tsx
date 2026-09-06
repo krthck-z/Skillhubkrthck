@@ -88,6 +88,7 @@ import {
 interface AppContextType {
   role: UserRole;
   setRole: (role: UserRole) => void;
+  switchPortal: (targetPortal: 'student' | 'industry' | 'institute') => void;
   activeTab: string;
   setActiveTab: (tab: string) => void;
   profile: StudentProfile;
@@ -125,6 +126,8 @@ interface AppContextType {
   showToast: (msg: string) => void;
   
   // Actions
+  updateProfile: (updates: Partial<StudentProfile>) => void;
+  addStartupExperience: (exp: StudentProfile['startupExperiences'][0]) => void;
   setTargetCareer: (career: string) => void;
   updatePrivacySetting: (key: keyof StudentProfile['privacySettings'], val: any) => void;
   startLearning: (id: string) => void;
@@ -315,6 +318,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } catch {
       // safe fallback
     }
+  };
+
+  const updateProfile = (updates: Partial<StudentProfile>) => {
+    setProfile((prev) => ({
+      ...prev,
+      ...updates
+    }));
+    showToast('Student profile details updated successfully!');
+  };
+
+  const addStartupExperience = (exp: StudentProfile['startupExperiences'][0]) => {
+    setProfile((prev) => ({
+      ...prev,
+      startupExperiences: [exp, ...(prev.startupExperiences || [])]
+    }));
+    showToast(`Added verified experience: ${exp.role} at ${exp.startupName}!`);
   };
 
   const updatePrivacySetting = (key: keyof StudentProfile['privacySettings'], val: any) => {
@@ -1196,7 +1215,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       recipientRole: newMail.recipientRole || 'SkillBridge Contact',
       recipientHandle: newMail.recipientHandle || '@contact.user',
       subject: newMail.subject,
-      preview: newMail.body.slice(0, 80) + '...',
+      preview: (newMail.body || '').slice(0, 80) + '...',
       body: newMail.body,
       timestamp: 'Just now',
       category: newMail.category || 'SYSTEM',
@@ -1245,7 +1264,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       senderHandle: '@karthik.patel',
       recipient: toRecipient,
       subject: `Fwd: ${original.subject}`,
-      preview: (forwardNote || original.preview).slice(0, 80),
+      preview: (forwardNote || original.preview || '').slice(0, 80),
       body: `${forwardNote ? forwardNote + '\n\n---------- Forwarded message ---------\n' : ''}${original.body}`,
       timestamp: 'Just now',
       category: original.category,
@@ -1710,11 +1729,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast(`Sent startup invitation to ${student.name}`);
   };
 
+  const switchPortal = (targetPortal: 'student' | 'industry' | 'institute') => {
+    setRole(targetPortal);
+    if (targetPortal === 'industry') {
+      setActiveTab('industry');
+      showToast('Switched to Industry & Corporate Recruiter Portal');
+    } else if (targetPortal === 'institute') {
+      setActiveTab('academia');
+      showToast('Switched to Academia & Institutional Administration Portal');
+    } else {
+      setActiveTab('ecosystem');
+      showToast('Switched to Student Portal');
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
         role,
         setRole,
+        switchPortal,
         activeTab,
         setActiveTab,
         profile,
@@ -1766,6 +1800,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setIsTrainJobModalOpen,
         toastMessage,
         showToast,
+        updateProfile,
+        addStartupExperience,
         setTargetCareer,
         updatePrivacySetting,
         startLearning,

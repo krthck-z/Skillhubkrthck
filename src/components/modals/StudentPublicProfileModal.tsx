@@ -185,7 +185,7 @@ export const StudentPublicProfileModal: React.FC<StudentPublicProfileModalProps>
             <button
               onClick={() => {
                 setMsgSubject(`Collaboration Inquiry from SkillBridge`);
-                setMsgBody(`Hi ${student.name},\n\nI noticed your verified projects and skills in ${student.verifiedSkills.slice(0, 3).join(', ')}. Would love to discuss collaborating!`);
+                setMsgBody(`Hi ${student.name},\n\nI noticed your verified projects and skills in ${(student.verifiedSkills || []).slice(0, 3).join(', ')}. Would love to discuss collaborating!`);
                 setIsMessageOpen(true);
               }}
               className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/20 text-white transition-all flex items-center gap-1.5 cursor-pointer"

@@ -25,14 +25,31 @@ export const initialStudentProfile: StudentProfile = {
   institution: 'Sri Sai Baba National Degree College (DEMO INSTITUTION)',
   location: 'Anantapur, Andhra Pradesh',
   targetCareer: 'Full Stack Developer',
-  careerReadiness: 72,
+  careerReadiness: 78,
+  enrollmentNumber: '22SSBN049',
+  email: 'karthik.peetla@gecv.ac.in',
+  phone: '+91 98765 43210',
+  bio: 'Passionate Full Stack Engineer specializing in TypeScript, React, Node.js microservices, and Generative AI application architecture. Proven experience building real-world AgriTech & SaaS portals.',
+  cgpa: '8.4 / 10',
+  batch: '2022–2026',
+  avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
+  speciality: 'Full-Stack Web Development + Generative AI',
+  interests: [
+    'Distributed Systems',
+    'Generative AI Applications & Agents',
+    'Interactive UI/UX & Responsive Systems',
+    'Cloud Microservices & Docker',
+    'Regional Tech Entrepreneurship'
+  ],
+  availability: 'Available for Immediate Internship / Project Engagements',
+  preferredLocations: ['Anantapur', 'Bengaluru', 'Hyderabad', 'Remote'],
   readinessBreakdown: {
-    skills: 75,
+    skills: 82,
     assessment: 80,
-    practical: 65,
-    experience: 55,
-    communication: 72,
-    industryAlignment: 78
+    practical: 78,
+    experience: 70,
+    communication: 76,
+    industryAlignment: 84
   },
   privacySettings: {
     profileVisibility: 'PUBLIC',
@@ -42,7 +59,15 @@ export const initialStudentProfile: StudentProfile = {
     mentorCommunication: true,
     startupParticipation: true
   },
-  startupExperiences: []
+  startupExperiences: [
+    {
+      role: 'Full Stack Engineering Intern',
+      startupName: 'FinPulse Tech Solutions',
+      duration: 'May 2025 – July 2025 (3 mos)',
+      skillsDemonstrated: ['React', 'TypeScript', 'Express', 'PostgreSQL', 'Docker'],
+      evidenceStatus: 'VERIFIED_DEFENSE'
+    }
+  ]
 };
 
 export const initialSkills: SkillItem[] = [

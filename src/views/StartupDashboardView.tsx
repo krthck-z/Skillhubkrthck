@@ -310,11 +310,11 @@ export const StartupDashboardView: React.FC = () => {
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white font-bold text-xs flex items-center justify-center shrink-0">
-                      {st.name.split(' ').map((n) => n[0]).slice(0, 2).join('')}
+                      {(st.name || 'Student').split(' ').map((n) => n[0] || '').slice(0, 2).join('')}
                     </div>
                     <div>
                       <h4 className="text-xs font-extrabold text-slate-900">{st.name}</h4>
-                      <p className="text-[11px] text-slate-500">{st.college.split(',')[0]}</p>
+                      <p className="text-[11px] text-slate-500">{(st.college || '').split(',')[0]}</p>
                     </div>
                   </div>
                   <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
@@ -323,7 +323,7 @@ export const StartupDashboardView: React.FC = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-1 mt-3">
-                  {st.verifiedSkills.slice(0, 3).map((sk) => (
+                  {(st.verifiedSkills || []).slice(0, 3).map((sk) => (
                     <span key={sk} className="text-[10px] px-1.5 py-0.5 rounded bg-white border border-slate-200 text-slate-700 font-semibold">
                       {sk}
                     </span>

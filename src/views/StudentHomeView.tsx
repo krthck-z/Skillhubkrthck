@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Sparkles,
   ArrowRight,
@@ -17,9 +17,16 @@ import {
   FileCheck,
   TrendingUp,
   MapPin,
-  Bell
+  Bell,
+  UserCheck,
+  Newspaper,
+  Flame,
+  ExternalLink,
+  Award
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { calculateProfileCompletion } from '../utils/profileCompletion';
+import { dailyUpdatesList } from '../data/dailyUpdatesData';
 
 export const StudentHomeView: React.FC = () => {
   const {
@@ -32,11 +39,26 @@ export const StudentHomeView: React.FC = () => {
     setActiveAssessmentModalItem,
     assessments,
     setSelectedOpportunityModal,
-    learningResources
+    learningResources,
+    studentProjects,
+    achievements
   } = useApp();
+
+  const [dailyFilter, setDailyFilter] = useState<string>('ALL');
+
+  const profileStatus = calculateProfileCompletion(profile, skills, studentProjects, achievements);
 
   const skillGaps = skills.filter((s) => s.gapPercentage > 0).sort((a, b) => b.gapPercentage - a.gapPercentage);
   const topGap = skillGaps[0] || { name: 'React & Component State', gapPercentage: 35 };
+
+  const filteredUpdates = dailyUpdatesList.filter((item) => {
+    if (dailyFilter === 'ALL') return true;
+    if (dailyFilter === 'TECH_NEWS') return item.type === 'TECH_NEWS';
+    if (dailyFilter === 'JOB_MARKET') return item.type === 'JOB_MARKET';
+    if (dailyFilter === 'SKILL_TREND') return item.type === 'SKILL_TREND';
+    if (dailyFilter === 'INDUSTRY_BULLETIN') return item.type === 'INDUSTRY_BULLETIN';
+    return true;
+  });
 
   // Recommended 2-3 items for student
   const recommendedCourse = learningResources.find(
@@ -48,11 +70,11 @@ export const StudentHomeView: React.FC = () => {
   ) || assessments[0];
 
   // Top 2-3 matching opportunities
-  const topOpportunities = opportunities.slice(0, 3);
+  const topOpportunities = (opportunities || []).slice(0, 3);
 
   // Filter important notifications
-  const importantNotifications = notifications.slice(0, 3);
-  const unreadMails = mailMessages.filter((m) => !m.isRead);
+  const importantNotifications = (notifications || []).slice(0, 3);
+  const unreadMails = (mailMessages || []).filter((m) => !m.isRead);
 
   return (
     <div className="space-y-8 pb-16 animate-in fade-in duration-200">
@@ -128,50 +150,118 @@ export const StudentHomeView: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Column: Active Evidence & Candidate Readiness Matrix (5 cols) */}
-          <div className="lg:col-span-5 bg-slate-50/90 rounded-2xl p-5 border border-slate-200/80 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200/60">
-              <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                  Live Evidence Calibration
+          {/* Right Column: Clean Professional Student Identity Card (5 cols) */}
+          <div className="lg:col-span-5 bg-slate-50/80 border border-slate-200/90 rounded-2xl p-5 shadow-2xs space-y-4 flex flex-col justify-between">
+            <div className="space-y-3.5">
+              {/* Card Header & Evidence Level */}
+              <div className="flex items-center justify-between pb-2.5 border-b border-slate-200/80">
+                <div className="flex items-center gap-1.5 text-slate-500">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+                    Verified Student Identity
+                  </span>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  Evidence Level 3 (Proctored)
                 </span>
               </div>
-              <span className="text-[11px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
-                48h SLA Active
-              </span>
+
+              {/* Student Identity with Photo */}
+              <div className="flex items-start gap-3.5">
+                <div className="relative shrink-0">
+                  <img
+                    src={profile.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80'}
+                    alt={profile.name}
+                    referrerPolicy="no-referrer"
+                    className="w-13 h-13 rounded-xl object-cover ring-1 ring-slate-200 shadow-2xs"
+                  />
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-600 ring-2 ring-white flex items-center justify-center">
+                    <CheckCircle2 className="w-2.5 h-2.5 text-white" />
+                  </div>
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-base font-extrabold text-slate-900 truncate leading-tight">
+                    {profile.name}
+                  </h3>
+                  <p className="text-xs text-slate-600 truncate mt-0.5 font-semibold">
+                    {profile.degree}
+                  </p>
+                  <p className="text-[11px] text-slate-500 truncate">
+                    {profile.institution.replace(' (DEMO INSTITUTION)', '')}
+                  </p>
+                </div>
+              </div>
+
+              {/* Target Career & Specialty — "What is this student good at?" */}
+              <div className="bg-white rounded-xl p-3 border border-slate-200/70 space-y-1.5 shadow-2xs">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-[10px] uppercase font-bold text-slate-400">Target Career</span>
+                  <span className="font-bold text-indigo-700 flex items-center gap-1">
+                    <Target className="w-3 h-3 text-indigo-600" />
+                    <span>{profile.targetCareer}</span>
+                  </span>
+                </div>
+                <div className="text-[11px] text-slate-700 font-medium flex items-center gap-1.5 pt-0.5 border-t border-slate-100">
+                  <Sparkles className="w-3 h-3 text-amber-500 shrink-0" />
+                  <span className="truncate">{profile.speciality || 'Full-Stack Web Development + Generative AI'}</span>
+                </div>
+              </div>
+
+              {/* Strongest Verified Skills */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  <span>Strongest Skills</span>
+                  <span className="text-indigo-600 font-semibold">{skills.filter(s => s.status === 'OFFLINE_VERIFIED' || s.status === 'PRACTICAL_VERIFIED').length} Verified</span>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {skills
+                    .filter((s) => s.currentLevel && s.currentLevel !== 'None')
+                    .slice(0, 4)
+                    .map((s) => (
+                      <span
+                        key={s.id}
+                        className="px-2 py-0.5 text-[10px] font-bold rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center gap-1"
+                      >
+                        <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" />
+                        <span>{s.name}</span>
+                      </span>
+                    ))}
+                </div>
+              </div>
+
+              {/* Four Proven Competency Metrics */}
+              <div className="grid grid-cols-4 gap-1.5 pt-1 text-center">
+                <div className="bg-white p-2 rounded-lg border border-slate-200/60 shadow-2xs">
+                  <span className="text-[9px] uppercase font-bold text-slate-400 block">Certs</span>
+                  <span className="text-xs font-bold text-slate-800">3 Done</span>
+                </div>
+                <div className="bg-white p-2 rounded-lg border border-slate-200/60 shadow-2xs">
+                  <span className="text-[9px] uppercase font-bold text-slate-400 block">Tests</span>
+                  <span className="text-xs font-bold text-emerald-700">4 Passed</span>
+                </div>
+                <div className="bg-white p-2 rounded-lg border border-slate-200/60 shadow-2xs">
+                  <span className="text-[9px] uppercase font-bold text-slate-400 block">Projects</span>
+                  <span className="text-xs font-bold text-slate-800">{studentProjects.length || 3} Live</span>
+                </div>
+                <div className="bg-white p-2 rounded-lg border border-slate-200/60 shadow-2xs">
+                  <span className="text-[9px] uppercase font-bold text-slate-400 block">Credits</span>
+                  <span className="text-xs font-bold text-indigo-700">{achievements.length || 6} Badges</span>
+                </div>
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 bg-white rounded-xl border border-slate-200/60 shadow-2xs">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Career Readiness</span>
-                <span className="text-xl font-black text-emerald-600">{profile.careerReadiness}%</span>
-                <span className="text-[10px] text-slate-500 block mt-0.5">Audited & Verified</span>
+            {/* Subtle Profile Completion & View Profile Action */}
+            <div className="pt-2 border-t border-slate-200/80 space-y-2">
+              <div className="flex items-center justify-between text-[10px] text-slate-500">
+                <span>Profile Readiness</span>
+                <span className="font-bold text-slate-700">{profileStatus.percentage}% Complete</span>
               </div>
-              <div className="p-3 bg-white rounded-xl border border-slate-200/60 shadow-2xs">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Target Role</span>
-                <span className="text-sm font-black text-slate-900 truncate block mt-1">{profile.targetCareer}</span>
-                <span className="text-[10px] text-indigo-600 font-semibold block mt-0.5">High Regional Demand</span>
-              </div>
-            </div>
-
-            <div className="space-y-2 pt-1">
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-semibold text-slate-600">Proctored Code Defense</span>
-                <span className="font-bold text-emerald-700">Tier 3 (Verified)</span>
-              </div>
-              <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                <div className="bg-emerald-500 h-full rounded-full transition-all duration-500" style={{ width: `${profile.careerReadiness}%` }} />
-              </div>
-            </div>
-
-            <div className="pt-2 flex items-center justify-between">
               <button
-                onClick={() => setActiveTab('assessments')}
-                className="w-full py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl border border-indigo-200/70 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                onClick={() => setActiveTab('profile')}
+                className="w-full py-2 bg-white hover:bg-slate-100 text-indigo-700 border border-indigo-200/80 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
               >
-                <span>Verify Next Skill Milestone</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span>View Full Skill Passport & Evidence →</span>
               </button>
             </div>
           </div>
@@ -567,6 +657,128 @@ export const StudentHomeView: React.FC = () => {
               <span className="text-[10px] text-slate-400 shrink-0 font-medium pt-0.5">
                 {n.timestamp}
               </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
+      {/* 6. DAILY TECH NEWS, JOB MARKET & SKILL TRENDS (Daily Updates)            */}
+      {/* ========================================================================= */}
+      <section className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-xs space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-50 text-indigo-700 border border-indigo-200/80">
+              <Flame className="w-3 h-3 text-indigo-600" />
+              <span>Real-Time Industry Intelligence</span>
+            </div>
+            <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+              <span>DAILY UPDATES & MARKET TRENDS</span>
+            </h2>
+            <p className="text-xs text-slate-500">
+              Curated tech movements, fast recruiter alerts, skill demand shifts, and Rayalaseema hiring bulletins.
+            </p>
+          </div>
+
+          {/* Interactive Category Filter Pills */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
+            {[
+              { id: 'ALL', label: 'All Updates' },
+              { id: 'TECH_NEWS', label: 'Tech News' },
+              { id: 'JOB_MARKET', label: 'Job Market' },
+              { id: 'SKILL_TREND', label: 'Skill Trends' },
+              { id: 'INDUSTRY_BULLETIN', label: 'Industry Bulletins' }
+            ].map((f) => (
+              <button
+                key={f.id}
+                onClick={() => setDailyFilter(f.id)}
+                className={`px-3 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                  dailyFilter === f.id
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Updates Grid */}
+        <div className="grid md:grid-cols-2 gap-4">
+          {filteredUpdates.map((item) => (
+            <div
+              key={item.id}
+              className="bg-slate-50/60 rounded-2xl p-5 border border-slate-200/80 hover:border-indigo-300 hover:bg-white transition-all flex flex-col justify-between space-y-4 group"
+            >
+              <div className="space-y-2.5">
+                {/* Meta Header */}
+                <div className="flex items-center justify-between gap-2">
+                  <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md border ${item.badgeColor}`}>
+                    {item.badge}
+                  </span>
+                  <div className="flex items-center gap-2 text-[11px] text-slate-400 font-medium">
+                    <span>{item.date}</span>
+                    <span>•</span>
+                    <span className="font-semibold text-slate-500">{item.region}</span>
+                  </div>
+                </div>
+
+                {/* Headline */}
+                <h3 className="text-sm font-extrabold text-slate-900 group-hover:text-indigo-600 transition-colors leading-snug">
+                  {item.headline}
+                </h3>
+
+                {/* Summary */}
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  {item.summary}
+                </p>
+
+                {/* Impact / Relevance Callout */}
+                <div className="bg-white rounded-xl p-3 border border-slate-200/70 text-xs text-slate-700 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase text-slate-400">Market Impact & Insight</span>
+                    <span className="text-[10px] font-bold text-emerald-700 font-mono bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">
+                      {item.relevanceScore}% Relevance
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 leading-relaxed">
+                    {item.impact}
+                  </p>
+                </div>
+
+                {/* Related Skills */}
+                <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1">Skills:</span>
+                  {item.relatedSkills.map((sk) => (
+                    <span
+                      key={sk}
+                      className="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-[10px] font-semibold text-slate-700"
+                    >
+                      {sk}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Card Footer: Source & Action */}
+              <div className="pt-3 border-t border-slate-200/60 flex items-center justify-between gap-3 text-xs">
+                <span className="text-[10px] text-slate-400 italic truncate">
+                  Source: {item.source}
+                </span>
+
+                {item.actionLabel && (
+                  <button
+                    onClick={() => {
+                      if (item.actionTab) setActiveTab(item.actionTab as any);
+                    }}
+                    className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl border border-indigo-200/80 transition-colors flex items-center gap-1 shrink-0 cursor-pointer"
+                  >
+                    <span>{item.actionLabel}</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>

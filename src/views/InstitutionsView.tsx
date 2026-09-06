@@ -402,7 +402,7 @@ export const InstitutionsView: React.FC = () => {
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
-            {institutions.slice(0, 6).map((inst) => (
+            {(institutions || []).slice(0, 6).map((inst) => (
               <div
                 key={inst.id}
                 className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs space-y-3"

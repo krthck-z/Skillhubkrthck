@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { LearningResource } from '../types';
+import { expandedLearningList } from '../data/expandedLearningData';
 
 export const LearningView: React.FC = () => {
   const {
@@ -48,25 +49,39 @@ export const LearningView: React.FC = () => {
 
   const categories = [
     { id: 'RECOMMENDED', label: 'Recommended for My Goal', icon: Sparkles, badge: profile.targetCareer },
+    { id: 'EMERGING_AI', label: 'Modern AI, IoT & 3D Media', icon: Zap },
     { id: 'INDUSTRY', label: 'Verified Industry Courses', icon: ShieldCheck },
     { id: 'REGIONAL_COLLEGE', label: 'Regional College Courses', icon: GraduationCap },
-    { id: 'FAST_TRACK', label: 'Fast Skill Tracks', icon: Zap },
+    { id: 'FAST_TRACK', label: 'Fast Skill Tracks', icon: Clock },
     { id: 'ASSESSMENT_LINKED', label: 'Assessment-Linked', icon: FileCheck },
     { id: 'CAPSTONE', label: 'Capstone Project Courses', icon: FolderGit2 },
     { id: 'OFFLINE_LOCAL', label: 'Local Offline (Anantapur)', icon: MapPin }
   ];
 
+  const allAvailableCourses = useMemo(() => {
+    return [...learningResources, ...expandedLearningList];
+  }, [learningResources]);
+
   const filteredResources = useMemo(() => {
-    return learningResources.filter((res) => {
+    return allAvailableCourses.filter((res) => {
       // 1. Category logic
       if (activeCategory === 'RECOMMENDED') {
         // Matched target skills or whyRecommended
         const matchesCareer =
           res.skill.toLowerCase().includes('react') ||
+          res.skill.toLowerCase().includes('prompt') ||
           res.skill.toLowerCase().includes('python') ||
           res.skill.toLowerCase().includes('sql') ||
           res.industryAlignment >= 85;
         if (!matchesCareer) return false;
+      } else if (activeCategory === 'EMERGING_AI') {
+        const isModern =
+          res.skill.toLowerCase().includes('prompt') ||
+          res.skill.toLowerCase().includes('hardware') ||
+          res.skill.toLowerCase().includes('vfx') ||
+          res.skill.toLowerCase().includes('ui/ux') ||
+          res.skill.toLowerCase().includes('marketing');
+        if (!isModern) return false;
       } else if (activeCategory === 'INDUSTRY') {
         const isInd = res.type === 'PAID_ONLINE' || res.industryAlignment >= 90 || res.verificationStatus.includes('Accredited') || res.provider.includes('IBM') || res.provider.includes('Meta') || res.provider.includes('Google');
         if (!isInd) return false;

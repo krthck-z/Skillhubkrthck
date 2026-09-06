@@ -314,7 +314,7 @@ export const InstitutionDashboardView: React.FC = () => {
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white font-bold text-xs flex items-center justify-center shrink-0">
-                    {st.name.split(' ').map((n) => n[0]).slice(0, 2).join('')}
+                    {(st.name || 'Student').split(' ').map((n) => n[0] || '').slice(0, 2).join('')}
                   </div>
                   <div className="min-w-0">
                     <h4 className="text-xs font-extrabold text-slate-900 truncate">{st.name}</h4>

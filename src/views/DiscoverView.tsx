@@ -335,10 +335,10 @@ export const DiscoverView: React.FC = () => {
                   {/* Verified Skills chips */}
                   <div className="space-y-1.5 pt-1">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                      Verified Skills ({st.verifiedSkills.length})
+                      Verified Skills ({(st.verifiedSkills || []).length})
                     </span>
                     <div className="flex flex-wrap gap-1">
-                      {st.verifiedSkills.slice(0, 4).map((sk, idx) => (
+                      {(st.verifiedSkills || []).slice(0, 4).map((sk, idx) => (
                         <span
                           key={idx}
                           className="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1"
@@ -347,9 +347,9 @@ export const DiscoverView: React.FC = () => {
                           {sk}
                         </span>
                       ))}
-                      {st.verifiedSkills.length > 4 && (
+                      {(st.verifiedSkills || []).length > 4 && (
                         <span className="px-1.5 py-0.5 rounded text-[11px] font-bold bg-slate-100 text-slate-600">
-                          +{st.verifiedSkills.length - 4}
+                          +{(st.verifiedSkills || []).length - 4}
                         </span>
                       )}
                     </div>

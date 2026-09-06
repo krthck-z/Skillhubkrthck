@@ -9,10 +9,10 @@
   }
 }
 
-/* Global responsive layout container: uses 90-94% of desktop viewport with max 1480px */
+/* Global responsive layout container: uses viewport space intelligently without giant empty margins */
 .app-container {
   width: 100%;
-  max-width: 1480px;
+  max-width: 1720px;
   margin-left: auto;
   margin-right: auto;
   padding-left: 1rem;
@@ -22,24 +22,22 @@
 
 @media (min-width: 640px) {
   .app-container {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
   }
 }
 
 @media (min-width: 1024px) {
   .app-container {
-    width: 93%;
-    padding-left: 2rem;
-    padding-right: 2rem;
+    padding-left: 1.75rem;
+    padding-right: 1.75rem;
   }
 }
 
 @media (min-width: 1536px) {
   .app-container {
-    width: 91%;
-    padding-left: 2.5rem;
-    padding-right: 2.5rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
   }
 }
 

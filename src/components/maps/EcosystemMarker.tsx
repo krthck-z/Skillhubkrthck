@@ -149,7 +149,7 @@ export const EcosystemMarker: React.FC<EcosystemMarkerProps> = ({
 
             {item.tags && item.tags.length > 0 && (
               <div className="flex flex-wrap gap-1 pt-0.5">
-                {item.tags.slice(0, 3).map((tag, idx) => (
+                {(item.tags || []).slice(0, 3).map((tag, idx) => (
                   <span
                     key={idx}
                     className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-medium"

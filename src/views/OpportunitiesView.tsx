@@ -12,33 +12,63 @@ import {
   Sparkles,
   ArrowRight,
   ExternalLink,
-  ChevronRight
+  ChevronRight,
+  Info,
+  Tag,
+  GraduationCap
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { OpportunityItem } from '../types';
+import { expandedOpportunitiesList, ExpandedOpportunity } from '../data/expandedOpportunitiesData';
 
 export const OpportunitiesView: React.FC = () => {
   const {
     opportunities,
     setSelectedOpportunityModal,
     setIsTrainJobModalOpen,
-    applyToOpportunity
+    applyToOpportunity,
+    showToast
   } = useApp();
 
+  const [domainFilter, setDomainFilter] = useState<string>('ALL');
   const [typeFilter, setTypeFilter] = useState<string>('ALL');
   const [eligibilityFilter, setEligibilityFilter] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const types = [
-    { id: 'ALL', label: 'All Openings' },
-    { id: 'INTERNSHIP', label: 'Internships' },
-    { id: 'FULL_TIME', label: 'Full-Time Jobs' },
-    { id: 'PART_TIME', label: 'Earn While You Learn (Part-Time)' },
-    { id: 'PROJECT', label: 'Live Projects' },
-    { id: 'HACKATHON', label: 'Hackathons' }
+  // Combine core opportunities with expanded multi-domain opportunities
+  const allOpportunitiesList = [
+    ...opportunities.map(o => ({
+      ...o,
+      careerDomain: 'Technology & AI' as const,
+      isSampleDemo: false,
+      applicationMode: 'DIRECT_APPLY' as const,
+      experienceRequired: '0–1 Years / Fresh Graduates'
+    })),
+    ...expandedOpportunitiesList
   ];
 
-  const filtered = opportunities.filter((opp) => {
+  const domains = [
+    'ALL',
+    'Technology & AI',
+    'Hardware & Robotics',
+    'Creative, Media & Design',
+    'Engineering & Manufacturing',
+    'Aviation, Travel & Hospitality',
+    'Agriculture & Agritech',
+    'Government & Public Sector'
+  ];
+
+  const types = [
+    { id: 'ALL', label: 'All Work Types' },
+    { id: 'INTERNSHIP', label: 'Internships' },
+    { id: 'FULL_TIME', label: 'Full-Time Roles' },
+    { id: 'PART_TIME', label: 'Earn While You Learn (Part-Time)' },
+    { id: 'FELLOWSHIP', label: 'Fellowships & Research' },
+    { id: 'HACKATHON', label: 'Hackathons & Challenges' }
+  ];
+
+  const filtered = allOpportunitiesList.filter((opp) => {
+    const matchesDomain = domainFilter === 'ALL' || opp.careerDomain === domainFilter;
     const matchesType = typeFilter === 'ALL' || opp.type === typeFilter;
     const matchesElig = eligibilityFilter === 'ALL' || opp.eligibilityStatus === eligibilityFilter;
     const matchesSearch =
@@ -46,40 +76,50 @@ export const OpportunitiesView: React.FC = () => {
       opp.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       opp.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
       opp.industry.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesType && matchesElig && matchesSearch;
+    return matchesDomain && matchesType && matchesElig && matchesSearch;
   });
 
   return (
     <div className="space-y-6 pb-12 animate-in fade-in duration-200">
       
       {/* Header Banner */}
-      <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">
-              <Briefcase className="w-4 h-4" />
-            </div>
-            <h1 className="text-xl font-extrabold text-slate-900">
-              Verified Opportunity & Hiring Engine
-            </h1>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 mb-2">
+            <Briefcase className="w-3.5 h-3.5" />
+            <span>Regional & Multi-Domain Opportunity Engine</span>
           </div>
-          <p className="text-xs text-slate-500 mt-1 max-w-2xl">
-            Real industry openings evaluated against your demonstrated passport. No blind keyword resume screening.
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            Verified Opportunities & Career Drives
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-2xl">
+            Real industry openings, apprenticeships, and university fellowships evaluated against your demonstrated passport. No blind resume scanning.
           </p>
         </div>
 
         <button
           onClick={() => setIsTrainJobModalOpen(true)}
-          className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-indigo-800 transition-all flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+          className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-bold text-xs rounded-2xl shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-indigo-800 transition-all flex items-center gap-2 cursor-pointer shrink-0"
         >
           <Sparkles className="w-4 h-4 text-amber-300" />
-          <span>Train For This Job Pathway</span>
+          <span>Train For Job Pathway</span>
         </button>
       </div>
 
+      {/* Demo Disclosure Transparency Notice */}
+      <div className="bg-amber-50/80 border border-amber-200 rounded-2xl p-4 flex items-start gap-3 text-xs text-amber-900">
+        <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+        <div>
+          <strong className="font-bold">SkillBridge Transparency Protocol:</strong>
+          <span className="ml-1 text-amber-800">
+            Real-world opportunities are marked with verified green badges. Curated simulations and educational exercises are explicitly labelled as <strong>[SAMPLE DEMO DATA]</strong> to maintain genuine recruiter trust.
+          </span>
+        </div>
+      </div>
+
       {/* Fast Match For Students Section */}
-      <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-6 text-white shadow-lg space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+      <div className="bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-4">
           <div>
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1">
@@ -90,195 +130,152 @@ export const OpportunitiesView: React.FC = () => {
                 Direct Recruiter Matching
               </span>
             </div>
-            <h2 className="text-lg font-extrabold text-white mt-1">
-              Quick Hire & Shortest Path Opportunities
+            <h2 className="text-xl sm:text-2xl font-black text-white mt-1">
+              Top Calibrated Matches for Your Profile
             </h2>
           </div>
-          <span className="text-xs text-slate-400">
-            Based on your verified skills & project evidence
+          <span className="text-xs text-indigo-300">
+            Based on your 92% readiness score & verified Git repositories
           </span>
         </div>
 
-        <div className="grid lg:grid-cols-12 gap-5">
-          {/* Quick Hire Block */}
-          <div className="lg:col-span-7 bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/15 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-emerald-300 flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                Quick Hire: 100% Skill Evidence Match
-              </span>
-              <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-extrabold">
-                Immediate Joining
-              </span>
-            </div>
-
-            <div className="p-3.5 rounded-lg bg-white/5 border border-white/10 space-y-2">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h3 className="text-sm font-bold text-white">Junior Frontend Developer (HTML/CSS/JS + Git)</h3>
-                  <p className="text-xs text-slate-300">
-                    Rayalaseema Digital Media • Anantapur / Hybrid • ₹18,000 / month
-                  </p>
+        <div className="grid md:grid-cols-2 gap-4">
+          {allOpportunitiesList.slice(0, 2).map((opp) => (
+            <div
+              key={`fast-${opp.id}`}
+              className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl p-5 transition-all flex flex-col justify-between space-y-4"
+            >
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-indigo-500/30 text-indigo-200 border border-indigo-400/20 uppercase">
+                    {opp.careerDomain}
+                  </span>
+                  <span className="text-sm font-black text-emerald-400 font-mono">
+                    {opp.matchScore}% Match
+                  </span>
                 </div>
-                <span className="text-xs font-black text-emerald-400 bg-emerald-950/80 px-2 py-1 rounded border border-emerald-500/30 shrink-0">
-                  4/4 Skills Met
-                </span>
+                <h3 className="font-bold text-base text-white">{opp.title}</h3>
+                <p className="text-xs text-slate-300">
+                  {opp.companyName} • <MapPin className="w-3 h-3 inline text-slate-400" /> {opp.location}
+                </p>
+                <p className="text-xs font-bold text-emerald-400 font-mono">{opp.stipendOrSalary}</p>
               </div>
 
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Company does not demand full-stack depth. They need clean semantic markup, responsive CSS, DOM manipulation, and clean Git commits. Your verified passport satisfies all 4 mandates.
-              </p>
-
-              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/10">
-                <div className="flex items-center gap-1.5 text-[11px] text-slate-300">
-                  <span className="px-2 py-0.5 rounded bg-white/10 text-emerald-300 font-semibold">HTML5 ✓</span>
-                  <span className="px-2 py-0.5 rounded bg-white/10 text-emerald-300 font-semibold">CSS3 ✓</span>
-                  <span className="px-2 py-0.5 rounded bg-white/10 text-emerald-300 font-semibold">JavaScript ES6 ✓</span>
-                  <span className="px-2 py-0.5 rounded bg-white/10 text-emerald-300 font-semibold">Git ✓</span>
-                </div>
-
+              <div className="flex items-center justify-between pt-2 border-t border-white/10 text-xs">
+                <span className="text-[11px] text-slate-400">Application Deadline: {opp.deadline}</span>
                 <button
-                  onClick={() => {
-                    const opp = opportunities.find((o) => o.id === 'opp-1') || opportunities[0];
-                    if (opp) applyToOpportunity(opp.id);
-                  }}
-                  className="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs rounded-lg transition-colors cursor-pointer flex items-center gap-1 shadow-xs"
+                  onClick={() => setSelectedOpportunityModal(opp)}
+                  className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-colors cursor-pointer"
                 >
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>1-Click Direct Apply (100% Match)</span>
+                  Quick Apply
                 </button>
               </div>
             </div>
-          </div>
-
-          {/* Shortest Path Block */}
-          <div className="lg:col-span-5 bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/15 space-y-3 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-amber-400" />
-                  Shortest Path to Hiring
-                </span>
-                <span className="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full font-bold">
-                  High Leverage
-                </span>
-              </div>
-
-              <div className="mt-2.5 p-3 rounded-lg bg-white/5 border border-white/10 space-y-2">
-                <div className="flex items-baseline justify-between">
-                  <span className="text-xs font-bold text-white">Target: React Hooks & State</span>
-                  <span className="text-xs text-amber-300 font-bold">Close 15% Gap</span>
-                </div>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Completing 1 practical React challenge qualifies you for <strong>3 immediate partner openings</strong> (NovaSoft, CloudScale, AgriSmart) paying up to ₹25,000/month.
-                </p>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setIsTrainJobModalOpen(true)}
-              className="w-full py-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-1.5"
-            >
-              <span>Take Micro-Assessment for 3 Roles →</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Philosophy Banner: Where Am I Eligible? (Section 15 & 16) */}
-      <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 text-xs flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2.5">
-          <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
-          <span className="text-emerald-950 font-medium">
-            <strong>Direct Recruiter Access:</strong> When your passport proves 100% verified match, employers bypass standard ATS resume filters and extend guaranteed interview slots.
-          </span>
-        </div>
-      </div>
-
-      {/* Filters and Search Bar */}
-      <div className="space-y-3 bg-white p-4 rounded-xl border border-slate-200">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="relative w-full sm:w-80">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-            <input
-              type="text"
-              placeholder="Search by title, company, or city..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:bg-white outline-none"
-            />
-          </div>
-
-          <div className="flex items-center gap-1.5 w-full sm:w-auto">
-            <span className="text-[11px] font-bold text-slate-500 uppercase">Status:</span>
-            {['ALL', 'ELIGIBLE', 'PARTIALLY_ELIGIBLE'].map((el) => (
-              <button
-                key={el}
-                onClick={() => setEligibilityFilter(el)}
-                className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
-                  eligibilityFilter === el
-                    ? 'bg-slate-900 text-white'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                {el === 'ALL' ? 'All' : (el || '').replace(/_/g, ' ')}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Opportunity Type Pill Tabs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 border-t border-slate-100">
-          {types.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setTypeFilter(t.id)}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer whitespace-nowrap ${
-                typeFilter === t.id
-                  ? 'bg-indigo-600 text-white shadow-2xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              {t.label}
-            </button>
           ))}
         </div>
       </div>
 
+      {/* Filter Bar: Domain, Work Type & Search */}
+      <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-2xs space-y-3">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          {/* Search Box */}
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search roles by title, company, skills, or city..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-900 bg-slate-50/50"
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <span className="font-bold text-slate-400">Career Domain:</span>
+            <select
+              value={domainFilter}
+              onChange={(e) => setDomainFilter(e.target.value)}
+              className="px-3 py-1.5 text-xs rounded-xl border border-slate-200 bg-white font-semibold text-slate-700"
+            >
+              {domains.map((d) => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
+
+            <select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              className="px-3 py-1.5 text-xs rounded-xl border border-slate-200 bg-white font-semibold text-slate-700"
+            >
+              {types.map((t) => (
+                <option key={t.id} value={t.id}>{t.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between text-xs text-slate-500 pt-1 border-t border-slate-100">
+          <span>Showing <strong>{filtered.length}</strong> opportunities matching your filters</span>
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="text-indigo-600 hover:underline cursor-pointer font-semibold"
+            >
+              Clear Search
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Opportunities List */}
-      <div className="space-y-3.5">
+      <div className="space-y-4">
         {filtered.map((opp) => (
           <div
             key={opp.id}
-            className={`bg-white rounded-2xl p-5 border transition-all flex flex-col md:flex-row md:items-center justify-between gap-5 ${
+            className={`bg-white rounded-3xl p-6 border transition-all flex flex-col md:flex-row md:items-center justify-between gap-6 ${
               opp.applied
                 ? 'border-emerald-200 bg-emerald-50/10'
-                : 'border-slate-200 hover:border-indigo-300 hover:shadow-xs'
+                : 'border-slate-200 hover:border-indigo-300 hover:shadow-md'
             }`}
           >
-            <div className="space-y-2 flex-1">
+            <div className="space-y-2.5 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-extrabold text-base text-slate-900">{opp.title}</span>
-                {opp.isVerifiedCompany && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
-                    <ShieldCheck className="w-3 h-3 text-emerald-600" /> Verified Partner
-                  </span>
-                )}
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 uppercase">
+                <span className="font-black text-lg text-slate-900">{opp.title}</span>
+                
+                {/* Domain Pill */}
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-100 text-slate-700 border border-slate-200">
+                  {opp.careerDomain}
+                </span>
+
+                {/* Work Type Pill */}
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 uppercase">
                   {(opp.type || '').replace(/_/g, ' ')}
                 </span>
+
+                {/* Verified vs Demo Tag */}
+                {opp.isSampleDemo || opp.companyName.includes('(DEMO)') ? (
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-amber-50 text-amber-800 border border-amber-200 tracking-wide">
+                    SAMPLE DEMO DATA
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3 text-emerald-600" /> Verified Industry Drive
+                  </span>
+                )}
               </div>
 
               <p className="text-xs text-slate-600">
-                <strong className="text-slate-800">{opp.companyName}</strong> • {opp.industry} • <MapPin className="w-3.5 h-3.5 inline text-slate-400 -mt-0.5" /> {opp.location}
+                <strong className="text-slate-900">{opp.companyName}</strong> • {opp.industry} • <MapPin className="w-3.5 h-3.5 inline text-slate-400 -mt-0.5" /> {opp.location}
               </p>
 
               <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 pt-0.5">
-                <span className="font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
+                <span className="font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-md font-mono">
                   {opp.stipendOrSalary}
                 </span>
                 <span>•</span>
-                <span>Duration: {opp.duration}</span>
+                <span>Work Mode: {opp.workMode}</span>
+                <span>•</span>
+                <span>Experience: {opp.experienceRequired}</span>
                 <span>•</span>
                 <span>Deadline: {opp.deadline}</span>
               </div>
@@ -289,7 +286,7 @@ export const OpportunitiesView: React.FC = () => {
                 {opp.requiredSkills.map((req, i) => (
                   <span
                     key={i}
-                    className={`px-2 py-0.5 rounded text-[11px] font-semibold flex items-center gap-1 ${
+                    className={`px-2 py-0.5 rounded-md text-[11px] font-semibold flex items-center gap-1 ${
                       req.met
                         ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                         : 'bg-rose-50 text-rose-800 border border-rose-200'
@@ -304,7 +301,7 @@ export const OpportunitiesView: React.FC = () => {
               {opp.missingSkills.length > 0 ? (
                 <p className="text-[11px] text-amber-800 flex items-center gap-1 font-medium">
                   <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                  Gap to bridge: <strong>{opp.missingSkills.join(', ')}</strong> (Take training pathway to qualify)
+                  Gaps to bridge: <strong>{opp.missingSkills.join(', ')}</strong> (Take training pathway to qualify)
                 </p>
               ) : (
                 <p className="text-[11px] text-emerald-700 flex items-center gap-1 font-semibold">
@@ -318,12 +315,12 @@ export const OpportunitiesView: React.FC = () => {
             <div className="flex md:flex-col items-center md:items-end justify-between md:justify-center gap-3 shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100">
               <div className="text-left md:text-right">
                 <div className="flex items-baseline md:justify-end gap-1.5">
-                  <span className="text-xl sm:text-2xl font-black text-slate-900 font-mono">
+                  <span className="text-2xl font-black text-slate-900 font-mono">
                     {opp.matchScore}%
                   </span>
                   <span className="text-[10px] uppercase font-bold text-slate-500">Match</span>
                 </div>
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                   opp.eligibilityStatus === 'ELIGIBLE'
                     ? 'bg-emerald-100 text-emerald-800'
                     : 'bg-amber-100 text-amber-800'
@@ -336,7 +333,7 @@ export const OpportunitiesView: React.FC = () => {
                 {opp.trainingPathAvailable && opp.missingSkills.length > 0 && (
                   <button
                     onClick={() => setIsTrainJobModalOpen(true)}
-                    className="px-3 py-1.5 text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-xl border border-indigo-200 transition-colors cursor-pointer"
+                    className="px-3 py-2 text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-xl border border-indigo-200 transition-colors cursor-pointer"
                   >
                     Train For This
                   </button>
@@ -344,7 +341,7 @@ export const OpportunitiesView: React.FC = () => {
 
                 <button
                   onClick={() => setSelectedOpportunityModal(opp)}
-                  className="px-4 py-1.5 bg-slate-900 hover:bg-indigo-600 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer"
+                  className="px-4 py-2 bg-slate-900 hover:bg-indigo-600 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer shadow-xs"
                 >
                   View Details
                 </button>

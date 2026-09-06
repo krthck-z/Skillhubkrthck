@@ -34,6 +34,8 @@ import { MessagesView } from './views/MessagesView';
 import { EcosystemHubView } from './views/EcosystemHubView';
 import { FacultyAcademiaView } from './views/FacultyAcademiaView';
 import { IndustryHiringView } from './views/IndustryHiringView';
+import { IndustryPortal } from './components/portals/IndustryPortal';
+import { AcademiaPortal } from './components/portals/AcademiaPortal';
 import { Footer } from './components/Footer';
 
 // Modals
@@ -50,15 +52,23 @@ import { GoogleMapsProvider } from './components/maps/GoogleMapsContext';
 import { ShieldCheck, Sparkles, Heart, Building2, GraduationCap, Users } from 'lucide-react';
 
 const MainContent: React.FC = () => {
-  const { activeTab, role, toastMessage, profile, setActiveTab } = useApp();
+  const { activeTab, role, switchPortal, toastMessage, profile, setActiveTab } = useApp();
   const currentRole = role || 'student';
 
   const renderActiveView = () => {
+    // If the active role is industry, deliver the genuine Industry Portal experience
+    if (currentRole === 'industry' && !['messages', 'chat', 'mailbox'].includes(activeTab)) {
+      return <IndustryPortal />;
+    }
+
+    // If the active role is institute/academia, deliver the genuine Academia Portal experience
+    if (currentRole === 'institute' && !['messages', 'chat', 'mailbox'].includes(activeTab)) {
+      return <AcademiaPortal />;
+    }
+
     switch (activeTab) {
       case 'home':
-        if (currentRole === 'institute') return <InstitutionDashboardView />;
         if (currentRole === 'startup') return <StartupDashboardView />;
-        if (currentRole === 'industry') return <IndustryView />;
         return <StudentHomeView />;
       case 'discover':
         return <DiscoverView />;
@@ -85,10 +95,11 @@ const MainContent: React.FC = () => {
       case 'fast-match':
       case 'companies':
       case 'talent-search':
-        return <IndustryView />;
+        return <IndustryPortal />;
       case 'faculty':
       case 'academia':
-        return <FacultyAcademiaView />;
+      case 'naac-reports':
+        return <AcademiaPortal />;
       case 'messages':
       case 'chat':
         return <MessagesView />;
@@ -96,7 +107,6 @@ const MainContent: React.FC = () => {
       case 'ecosystem-hub':
         return <EcosystemHubView />;
       case 'institutions':
-        if (currentRole === 'institute') return <InstitutionDashboardView />;
         return <InstitutionsView />;
       case 'mentors':
       case 'contacts':
@@ -131,37 +141,36 @@ const MainContent: React.FC = () => {
 
       {/* Perspective / Role Banner (If switched to Industry, Institution, or Startup) */}
       {currentRole !== 'student' && (
-        <div className="bg-indigo-950 text-indigo-100 border-b border-indigo-800 py-2.5 text-xs">
-          <div className="app-container flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div className="bg-indigo-950 text-indigo-100 border-b border-indigo-800/80 py-2.5 text-xs shadow-inner">
+          <div className="app-container flex flex-col sm:flex-row items-center justify-between gap-2.5">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span>
-                Active Perspective: <strong className="capitalize text-white">{currentRole}</strong> — Viewing authenticated benchmarks, candidate portfolios, and departmental analytics.
+                Active Perspective: <strong className="capitalize text-white font-bold">{currentRole === 'institute' ? 'Academia / Institution' : currentRole}</strong> Portal — Isolated workspace with role-specific workflows and analytics.
               </span>
             </div>
-            <div className="flex items-center gap-3">
-              {currentRole === 'institute' && (
+            <div className="flex items-center gap-2.5">
+              <button
+                onClick={() => switchPortal('student')}
+                className="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white rounded-lg font-bold text-xs transition-colors flex items-center gap-1 cursor-pointer"
+              >
+                <span>← Student Portal</span>
+              </button>
+              {currentRole === 'industry' ? (
                 <button
-                  onClick={() => setActiveTab('institutions')}
-                  className="text-xs font-bold text-amber-300 hover:text-white underline cursor-pointer"
+                  onClick={() => switchPortal('institute')}
+                  className="px-2.5 py-1 bg-emerald-800/60 hover:bg-emerald-700 text-emerald-200 hover:text-white rounded-lg font-bold text-xs transition-colors flex items-center gap-1 cursor-pointer border border-emerald-600/40"
                 >
-                  View Colleges Directory →
+                  <GraduationCap className="w-3.5 h-3.5" />
+                  <span>Academia Portal</span>
                 </button>
-              )}
-              {currentRole === 'startup' && (
+              ) : (
                 <button
-                  onClick={() => setActiveTab('startups')}
-                  className="text-xs font-bold text-amber-300 hover:text-white underline cursor-pointer"
+                  onClick={() => switchPortal('industry')}
+                  className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 hover:text-white rounded-lg font-bold text-xs transition-colors flex items-center gap-1 cursor-pointer border border-slate-700"
                 >
-                  View Startup Ideas Hub →
-                </button>
-              )}
-              {currentRole === 'industry' && (
-                <button
-                  onClick={() => setActiveTab('industry')}
-                  className="text-xs font-bold text-amber-300 hover:text-white underline cursor-pointer"
-                >
-                  48h Candidate Matrix →
+                  <Building2 className="w-3.5 h-3.5" />
+                  <span>Industry Portal</span>
                 </button>
               )}
             </div>
